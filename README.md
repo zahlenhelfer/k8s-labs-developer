@@ -16,3 +16,6 @@ Kubernetes Developer Training Files
 - [Storage](/labs/05-storage/README.md)
 - [Secrets](/labs/06-secrets/README.md)
 - [Adv. Workloads](/labs/07-adv-workload/README.md)
+- [Ingress](/labs/08-ingress/README.md)
+- [Security](/labs/09-security/README.md)
+- [Helm](/labs/10-helm/README.md)
