@@ -1,9 +1,6 @@
 # k8s-labs-developer
 Kubernetes Developer Training Files
 
-## Login:
-- `ssh student@k8s-node-XX.dockerlabs.de`
-
 ## Setup
 - [Setup eines 2 Knoten-Cluster](/setup/installation-2-nodes.md)
 

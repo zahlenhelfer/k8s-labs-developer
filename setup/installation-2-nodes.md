@@ -1,5 +1,8 @@
 # Installation 2 Node-Kubernetes-Cluter
 
+## Login:
+- `ssh student@k8s-node-XX.dockerlabs.de`
+
 ## Installiere die Control-Plane:
 - Login auf den ersten Server
 - wechsel in das Verzeichnis: `cd LFD459/SOLUTIONS/s_02/`
