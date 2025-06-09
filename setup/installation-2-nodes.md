@@ -1,0 +1,26 @@
+# Installation 2 Node-Kubernetes-Cluter
+
+## Installiere die Control-Plane:
+- Login auf den ersten Server
+- wechsel in das Verzeichnis: `cd LFD459/SOLUTIONS/s_02/`
+- `bash k8scp.sh | tee $HOME/controlplane.out`
+- bei der Frage bitte `keep the local version currently installed` auswählen
+- Kopieren des Join-Befehls: `kubeadm join <ip>:6443 --token 1123 --discovery-token-ca-cert-hash sha256:16df252`
+- Installation der Auto-Completion:
+```bash
+$ source <(kubectl completion bash)
+$ echo "source <(kubectl completion bash)" >> $HOME/.bashrc
+```
+- Installation Prüfen:
+```bash 
+kubectl get nodes
+NAME         STATUS   ROLES           AGE   VERSION
+k8s-node-0   Ready    control-plane   11m   v1.33.1
+```
+
+## Installiere den Worker:
+- Login auf den zweiten Server
+- wechsel in das Verzeichnis: `cd LFD459/SOLUTIONS/s_02/`
+- `bash k8sWorker.sh`
+- `sudo kubeadm join ...`
+- wechsel zur Control-Plane und wiederholtes: `kubectl get nodes`
