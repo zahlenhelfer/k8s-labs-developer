@@ -17,6 +17,8 @@ kubectl get nodes
 NAME         STATUS   ROLES           AGE   VERSION
 k8s-node-0   Ready    control-plane   11m   v1.33.1
 ```
+- Taint enfernen:
+`kubectl taint nodes --all node-role.kubernetes.io/control-plane-`
 
 ## Installiere den Worker:
 - Login auf den zweiten Server
