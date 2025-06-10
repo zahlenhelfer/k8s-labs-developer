@@ -73,6 +73,11 @@ kubectl exec -it limited-nginx-pod -- stress --cpu 2 --timeout 30
 
 ## 📈 Bonus: Nutzung überwachen (mit Metrics-Server)
 
+Metric-Server installieren:
+```bash
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+```
+
 Wenn du den [metrics-server](https://github.com/kubernetes-sigs/metrics-server) installiert hast:
 
 ```bash
