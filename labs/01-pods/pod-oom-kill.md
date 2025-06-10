@@ -19,7 +19,7 @@ spec:
   containers:
   - name: memory-hog
     image: python:3.12-slim
-    command: ["python3", "-c", "a = ['x' * 1024 * 1024] * 200; import time; time.sleep(30)"]
+    command: ["python3", "-c", "a = ['x' * 1024 * 1024 * 1024] * 200; import time; time.sleep(30)"]
     resources:
       limits:
         memory: "50Mi"
