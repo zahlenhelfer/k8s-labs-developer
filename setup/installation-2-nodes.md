@@ -8,7 +8,8 @@
 - wechsel in das Verzeichnis: `cd LFD459/SOLUTIONS/s_02/`
 - starten des Scripts: `script -q -c "bash k8scp.sh" $HOME/controlplane.out`
 - bei der Frage `keep the local version currently installed` auswählen
-- Kopieren des Join-Befehls: `kubeadm join <ip>:6443 --token 1123 --discovery-token-ca-cert-hash sha256:16df252`
+- Kopieren des Join-Befehls <kubeadm join> aus der Log-Datei per grep: `grep -A1 "kubeadm join" controlplane.out`
+- Besipieloutput: `kubeadm join <ip>:6443 --token 1123 --discovery-token-ca-cert-hash sha256:16df252`
 - Installation der Auto-Completion:
 ```bash
 $ source <(kubectl completion bash)
