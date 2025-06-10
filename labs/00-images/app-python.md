@@ -1,9 +1,9 @@
 
-## 🛠️ Übung: Docker-Image für eine einfache Python-App erstellen
+# 🛠️ Übung: Docker-Image für eine einfache Python-App erstellen
 
 ---
 
-### 🎯 Ziel
+## 🎯 Ziel
 
 * Eine einfache Python-Web-App (mit Flask) schreiben
 * Ein Dockerfile erstellen

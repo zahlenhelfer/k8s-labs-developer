@@ -1,9 +1,9 @@
 
-## 🛠️ Übung: Docker-Image für eine einfache Node.js-App erstellen
+# 🛠️ Übung: Docker-Image für eine einfache Node.js-App erstellen
 
 ---
 
-### 🎯 Ziel
+## 🎯 Ziel
 
 * Eine kleine Node.js-Web-App schreiben (mit Express)
 * Ein Dockerfile erstellen

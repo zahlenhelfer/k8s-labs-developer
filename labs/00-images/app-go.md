@@ -1,9 +1,9 @@
 
-## 🛠️ Übung: Docker-Image für eine einfache Go-App erstellen
+# 🛠️ Übung: Docker-Image für eine einfache Go-App erstellen
 
 ---
 
-### 🎯 Ziel
+## 🎯 Ziel
 
 * Eine kleine Go-Anwendung schreiben
 * Ein Dockerfile für diese App erstellen
