@@ -73,6 +73,8 @@ kubectl exec -it simple-nginx-pod -- /bin/bash
 
 Du kannst z. B. mit `curl localhost` im Container prüfen, ob Nginx antwortet.
 
+Um den Container zu verlassen bitte `exit` eingeben.
+
 ---
 
 ## 🧩 Schritt 7: Testen, ob Nginx von außen erreichbar ist (optional)
