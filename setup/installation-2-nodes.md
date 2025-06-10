@@ -6,8 +6,8 @@
 ## Installiere die Control-Plane:
 - Login auf den ersten Server
 - wechsel in das Verzeichnis: `cd LFD459/SOLUTIONS/s_02/`
-- `bash k8scp.sh | tee $HOME/controlplane.out`
-- bei der Frage bitte `keep the local version currently installed` auswählen
+- starten des Scripts: `bash k8scp.sh | tee $HOME/controlplane.out`
+- bei der Frage `keep the local version currently installed` auswählen
 - Kopieren des Join-Befehls: `kubeadm join <ip>:6443 --token 1123 --discovery-token-ca-cert-hash sha256:16df252`
 - Installation der Auto-Completion:
 ```bash
