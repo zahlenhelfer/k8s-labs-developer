@@ -1,5 +1,3 @@
----
-
 ## 🛠️ **Übung: ReplicaSet mit NGINX**
 
 ### 🎯 Ziel
