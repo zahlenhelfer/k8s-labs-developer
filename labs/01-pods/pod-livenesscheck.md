@@ -87,7 +87,7 @@ Du solltest sehen, dass sich die Spalte `RESTARTS` erhöht.
 
 ---
 
-## ✅ Bonus: Pod löschen
+## ✅ Aufräumen: Pod löschen
 
 ```bash
 kubectl delete pod liveness-demo
