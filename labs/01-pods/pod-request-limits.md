@@ -1,6 +1,6 @@
-## 🛠️ **Übung: Resource Requests & Limits für einen Pod setzen**
+# 🛠️ **Übung: Resource Requests & Limits für einen Pod setzen**
 
-### 🎯 Ziel
+## 🎯 Ziel
 
 * Einen Pod mit **CPU- und Speicher-Limits** erstellen.
 * Die Auswirkungen der Ressourcenbeschränkung beobachten.
@@ -8,7 +8,7 @@
 
 ---
 
-### 📁 Schritt 1: Erstelle eine Datei `resource-limits-pod.yaml`
+## 📁 Schritt 1: Erstelle eine Datei `resource-limits-pod.yaml`
 
 ```yaml
 apiVersion: v1
@@ -38,7 +38,7 @@ spec:
 
 ---
 
-### 🚀 Schritt 2: Pod anwenden
+## 🚀 Schritt 2: Pod anwenden
 
 ```bash
 kubectl apply -f resource-limits-pod.yaml
@@ -46,7 +46,7 @@ kubectl apply -f resource-limits-pod.yaml
 
 ---
 
-### 🔍 Schritt 3: Status und Ressourcen prüfen
+## 🔍 Schritt 3: Status und Ressourcen prüfen
 
 ```bash
 kubectl get pod limited-nginx-pod
@@ -57,7 +57,7 @@ Suche im Output nach dem Abschnitt `Limits` und `Requests`.
 
 ---
 
-### 🧪 Schritt 4: Ressourcenverhalten testen (optional)
+## 🧪 Schritt 4: Ressourcenverhalten testen (optional)
 
 Installiere `stress` im Container (nur zu Testzwecken):
 
@@ -71,7 +71,7 @@ kubectl exec -it limited-nginx-pod -- stress --cpu 2 --timeout 30
 
 ---
 
-### 📈 Bonus: Nutzung überwachen (mit Metrics-Server)
+## 📈 Bonus: Nutzung überwachen (mit Metrics-Server)
 
 Wenn du den [metrics-server](https://github.com/kubernetes-sigs/metrics-server) installiert hast:
 
@@ -83,7 +83,7 @@ kubectl top pod limited-nginx-pod
 
 ---
 
-### 🧹 Schritt 5: Aufräumen
+## 🧹 Schritt 5: Aufräumen
 
 ```bash
 kubectl delete pod limited-nginx-pod
@@ -91,7 +91,7 @@ kubectl delete pod limited-nginx-pod
 
 ---
 
-### 📚 Was du lernst
+## 📚 Was du lernst
 
 * Unterschied zwischen `requests` (Garantien) und `limits` (Obergrenzen).
 * Wie Kubernetes Ressourcen verwaltet.

@@ -1,6 +1,6 @@
-## 💥 **Erweiterte Übung: OOMKill (Out Of Memory Kill) provozieren**
+# 💥 **Erweiterte Übung: OOMKill (Out Of Memory Kill) provozieren**
 
-### 🎯 Ziel
+## 🎯 Ziel
 
 * Einen Pod mit einer **bewusst niedrigen Speichergrenze** erstellen.
 * Ein Skript ausführen, das zu viel RAM nutzt.
@@ -8,7 +8,7 @@
 
 ---
 
-### 📁 Schritt 1: YAML-Datei `oomkill-pod.yaml`
+## 📁 Schritt 1: YAML-Datei `oomkill-pod.yaml`
 
 ```yaml
 apiVersion: v1
@@ -34,7 +34,7 @@ spec:
 
 ---
 
-### 🚀 Schritt 2: Pod starten
+## 🚀 Schritt 2: Pod starten
 
 ```bash
 kubectl apply -f oomkill-pod.yaml
@@ -42,7 +42,7 @@ kubectl apply -f oomkill-pod.yaml
 
 ---
 
-### ⏱️ Schritt 3: Beobachte das Verhalten
+## ⏱️ Schritt 3: Beobachte das Verhalten
 
 Gib dem Pod ein paar Sekunden, dann prüfe den Status:
 
@@ -60,7 +60,7 @@ Reason:         OOMKilled
 
 ---
 
-### 🧠 Schritt 4: Verständnis vertiefen
+## 🧠 Schritt 4: Verständnis vertiefen
 
 ```bash
 kubectl get pod oom-demo -o jsonpath='{.status.containerStatuses[0].lastState.terminated.reason}'
@@ -70,7 +70,7 @@ Gibt `"OOMKilled"` zurück, wenn Kubernetes den Container aufgrund von zu hohem 
 
 ---
 
-### 🧹 Schritt 5: Aufräumen
+## 🧹 Schritt 5: Aufräumen
 
 ```bash
 kubectl delete pod oom-demo
@@ -78,7 +78,7 @@ kubectl delete pod oom-demo
 
 ---
 
-### 📚 Was Du hier gelernt hast
+## 📚 Was Du hier gelernt hast
 
 | Konzept            | Bedeutung                                                                                    |
 | ------------------ | -------------------------------------------------------------------------------------------- |

@@ -1,6 +1,6 @@
 ## 🛠️ **Übung: Erstelle einen Pod mit Liveness-Probe in Kubernetes**
 
-### 🎯 Ziel
+## 🎯 Ziel
 
 * Einen einfachen Pod mit einem HTTP-Service erstellen.
 * Eine **Liveness-Probe** konfigurieren, die die Verfügbarkeit des Containers überwacht.
@@ -8,7 +8,7 @@
 
 ---
 
-### 🧩 Schritt 1: YAML-Datei für den Pod schreiben
+## 🧩 Schritt 1: YAML-Datei für den Pod schreiben
 
 Erstelle eine Datei namens `liveness-pod.yaml` mit folgendem Inhalt:
 
@@ -39,7 +39,7 @@ spec:
 
 ---
 
-### 🧩 Schritt 2: Pod erstellen
+## 🧩 Schritt 2: Pod erstellen
 
 ```bash
 kubectl apply -f liveness-pod.yaml
@@ -47,7 +47,7 @@ kubectl apply -f liveness-pod.yaml
 
 ---
 
-### 🧩 Schritt 3: Status prüfen
+## 🧩 Schritt 3: Status prüfen
 
 ```bash
 kubectl describe pod liveness-demo
@@ -58,7 +58,7 @@ Beobachte, ob der Pod stabil läuft.
 
 ---
 
-### 🧪 Schritt 4: Liveness absichtlich fehlschlagen lassen
+## 🧪 Schritt 4: Liveness absichtlich fehlschlagen lassen
 
 Um den Check scheitern zu lassen, kannst du in den laufenden Pod eingreifen:
 
@@ -77,7 +77,7 @@ Jetzt sollte der Liveness-Check fehlschlagen, und Kubernetes startet den Contain
 
 ---
 
-### 🔍 Schritt 5: Neustarts beobachten
+## 🔍 Schritt 5: Neustarts beobachten
 
 ```bash
 kubectl get pod liveness-demo
@@ -87,16 +87,8 @@ Du solltest sehen, dass sich die Spalte `RESTARTS` erhöht.
 
 ---
 
-### ✅ Bonus: Pod löschen
+## ✅ Bonus: Pod löschen
 
 ```bash
 kubectl delete pod liveness-demo
 ```
-
----
-
-### 📚 Was hast Du gelernt:
-
-* Wie Liveness-Probes funktionieren.
-* Wie Kubernetes Container automatisch neustartet, wenn der Liveness-Check fehlschlägt.
-* Wie man einen Fehler simuliert, um das Verhalten zu testen.
