@@ -18,7 +18,7 @@ jobs:
         with:
           sources: "./README.md labs/**/*.md setup/**/*.md"
       - name: Upload Document
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         id: upload-document
         with:
           name: "document.pdf"
