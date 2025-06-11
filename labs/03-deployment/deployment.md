@@ -106,7 +106,7 @@ kubectl get pods -l app=nginx
 kubectl rollout history deployment nginx-deployment
 ```
 
-→ Zurück auf `nginx:1.25` (REVISION 2)
+→ Zurück auf `nginx:1.25` (REVISION 2) -> die dann als (REVISION 4) geführt wird
 
 Optional: Rollback auf eine konkrete Revision:
 
