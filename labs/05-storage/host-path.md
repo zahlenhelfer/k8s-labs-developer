@@ -1,7 +1,7 @@
 
-## 🛠️ Übung: Persistent Volume (PV) und Persistent Volume Claim (PVC) in Kubernetes
+# 🛠️ Übung: Persistent Volume (PV) und Persistent Volume Claim (PVC) in Kubernetes
 
-### 🎯 Ziel
+## 🎯 Ziel
 
 * Ein statisches Persistent Volume (PV) anlegen
 * Einen Persistent Volume Claim (PVC) erstellen, der das PV beansprucht
