@@ -1,25 +1,31 @@
-name: Upload Document as Artifact
-
-on: [push]
-
-env:
-  GITHUB_TOKEN: ${{ github.token }}
+name: Docs to PDF
+# This workflow is triggered on pushes to the repository.
+on:
+  push:
+    branches:
+      - main
+    # Paths can be used to only trigger actions when you have edited certain files, such as a file within the /docs directory
+    paths:
+      - "README.md"
+      - "setup/**.md"
+      - "labs/**/*.md"
 
 jobs:
-  publish:
+  converttopdf:
+    name: Build PDF
     runs-on: ubuntu-latest
-    name: Publish Document
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Publish PDF Document
-        uses: shrink/actions-document-publish@v1
-        id: publish-document
+      - uses: actions/checkout@v3
+      - uses: baileyjm02/markdown-to-pdf@v1
         with:
-          sources: "./README.md labs/**/*.md setup/**/*.md"
-      - name: Upload Document
-        uses: actions/upload-artifact@v4
-        id: upload-document
+          input_dir: docs
+          output_dir: pdfs
+          images_dir: docs/images
+          # for example <img src="./images/file-name.png">
+          image_import: ./images
+          # Default is true, can set to false to only get PDF files
+          build_html: false
+      - uses: actions/upload-artifact@v3
         with:
-          name: "document.pdf"
-          path: ${{ steps.publish-document.outputs.pdf }}
+          name: docs
+          path: pdfs

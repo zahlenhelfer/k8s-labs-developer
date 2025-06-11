@@ -81,3 +81,12 @@ kubectl describe rs rs-demo
 
 * Unter `Pods Status` siehst du: 1 aktuell kontrollierter Pod
 * Der „entkoppelte“ Pod zählt nicht mehr dazu
+
+---
+
+## 🧹 Schritt 6: Aufräumen
+
+
+```bash
+kubectl delete rs rs-demo
+```

@@ -89,7 +89,8 @@ Dann kannst du im Browser `http://localhost:8080` aufrufen.
 
 ---
 
-## 🧹 Schritt 8: Pod löschen
+## 🧹 Schritt 8: Aufräumen
+
 
 ```bash
 kubectl delete pod simple-nginx-pod
