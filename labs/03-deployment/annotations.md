@@ -17,7 +17,7 @@ kubectl create deployment my-app --image=nginx --replicas=2 \
   --dry-run=client -o yaml > my-app.yaml
 ```
 
-Bearbeite die Datei `my-app.yaml` und füge **diese Annotation** hinzu:
+Bearbeite die Datei `my-app.yaml` und füge **diese Annotation** im Deployment-Kopf hinzu (__NICHT__ im Template):
 
 ```yaml
 metadata:
