@@ -3,6 +3,7 @@ Kubernetes Developer Training Files
 
 ## Setup
 - [Setup eines 2 Knoten-Cluster](/setup/installation-2-nodes.md)
+- [Setup NGINX Ingress-Controller](/setup/installation-ingress.md)
 
 ## Labs
 - [Container Images](/labs/00-images/README.md)
