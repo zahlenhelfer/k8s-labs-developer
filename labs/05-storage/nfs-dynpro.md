@@ -49,7 +49,7 @@ Das erstellt:
 
 * eine `Deployment` für den Provisioner
 * eine `StorageClass` namens `nfs-client`
-* dynamische Volume-Verzeichnisse unter `/student00` für jede PVC
+* dynamische Volume-Verzeichnisse unter `/srv/nfs/student-share` für jede PVC
 
 ---
 
