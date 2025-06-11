@@ -40,7 +40,7 @@ kubectl create namespace nfs-storage
 helm install nfs-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
   --namespace nfs-storage \
   --set nfs.server=nfs.dockerlabs.de \
-  --set nfs.path=/student-share \
+  --set nfs.path=/srv/nfs/student-share \
   --set storageClass.name=nfs-client \
   --set storageClass.defaultClass=false
 ```
