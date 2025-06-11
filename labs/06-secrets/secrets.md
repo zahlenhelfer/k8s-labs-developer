@@ -92,7 +92,7 @@ spec:
   containers:
   - name: demo
     image: busybox
-    command: [ "sh", "-c", "echo Datei-Inhalte:; cat /etc/secret-volume/username; cat /etc/secret-volume/password; sleep 3600" ]
+    command: [ "sh", "-c", "echo Datei-Inhalte:; cat /etc/secret-volume/username; echo; cat /etc/secret-volume/password; echo; sleep 3600" ]
     volumeMounts:
     - name: secret-vol
       mountPath: "/etc/secret-volume"
