@@ -1,4 +1,4 @@
-# Installation 2 Node-Kubernetes-Cluter
+# Installation eines zwei Node Kubernetes-Cluster
 
 ## Login:
 - `ssh student@k8s-node-XX.dockerlabs.de`
