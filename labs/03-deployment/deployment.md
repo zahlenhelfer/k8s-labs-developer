@@ -89,7 +89,7 @@ Prüfe:
 kubectl rollout status deployment nginx-deployment
 ```
 
-→ Rollout **hängt**, weil das Image nicht existiert.
+→ Rollout **hängt**, weil das Image nicht existiert. Bitte die Ausgabe mit `Control+C` verlassen
 
 ---
 
