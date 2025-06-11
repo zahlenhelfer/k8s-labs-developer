@@ -22,7 +22,7 @@
 
 ## 📁 Schritt 1: NFS Provisioner installieren
 
-Installation des NFS-Clients auf beiden Nodes per
+Installation des NFS-Clients auf __beiden__ Nodes per
 `sudo apt install nfs-client -y`
 
 Verwende den offiziellen Helm-Chart:
