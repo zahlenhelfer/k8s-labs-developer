@@ -13,6 +13,7 @@
 ---
 
 ## 📁 Schritt 1: Projektstruktur
+- __ACHTUNG:__ docker alias für podman nutzen -> `alias docker=podman`
 
 - Projekt anlegen `mkdir java-spring-multistage && cd java-spring-multistage`
 
