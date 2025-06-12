@@ -100,7 +100,12 @@ kubectl apply -f nginx-ingress.yaml
 
 ---
 
-## 🛠️ 3. Lokales DNS setzen
+## 🛠️ 3. Testen per `curl` mit Header-Manipulation
+
+`curl -H "Host: example.local" http://<IP>`
+
+---
+## 🛠️ 3a. Lokales DNS setzen
 
 Füge zu deiner `/etc/hosts` folgendes hinzu (Root-Rechte nötig):
 
