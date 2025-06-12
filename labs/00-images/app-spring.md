@@ -110,7 +110,7 @@ public class DemoApplication {
 
 ```dockerfile
 # Stage 1: Build
-FROM maven:3.8.7-eclipse-temurin-17 AS builder
+FROM docker.io/maven:3.8.7-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
@@ -120,7 +120,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Stage 2: Run
-FROM eclipse-temurin:17-jre-alpine
+FROM docker.io/eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
