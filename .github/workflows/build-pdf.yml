@@ -30,10 +30,12 @@ jobs:
         mkdir -p pdfs
         for md_file in $(find . -name "*.md"); do
           echo "Converting $md_file to PDF..."
+          # Remove the leading './' from the md_file path
+          relative_path=$(echo "$md_file" | sed 's|^\./||')
           # Create the directory structure for the PDF file
-          pdf_dir="pdfs/$(dirname "${md_file}")"
+          pdf_dir="pdfs/$(dirname "$relative_path")"
           mkdir -p "$pdf_dir"
-          if pandoc "$md_file" -o "${pdf_dir}/${md_file%.md}.pdf"; then
+          if pandoc "$md_file" -o "${pdf_dir}/$(basename "${md_file%.md}".pdf)"; then
             echo "Successfully converted $md_file"
           else
             echo "Failed to convert $md_file"
