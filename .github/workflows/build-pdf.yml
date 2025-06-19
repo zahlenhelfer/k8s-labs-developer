@@ -1,4 +1,4 @@
-name: Docs to PDF
+name: Convert Markdown to PDF
 # This workflow is triggered on pushes to the repository.
 on:
   push:
@@ -13,27 +13,53 @@ on:
 jobs:
   convert-and-release:
     runs-on: ubuntu-latest
-    container:
-      image: pandoc/latex:latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Convert Markdown to PDF
-      run: |
-        pandoc README.md -o README.pdf --toc
+      - name: Install Pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
 
-    - name: Create Release Tag
-      id: create_tag
-      run: |
-        # Generate a tag name based on the current date and short commit hash
-        TAG_NAME="release-$(date +'%Y%m%d')-$(git rev-parse --short HEAD)"
-        echo "TAG_NAME=$TAG_NAME" >> $GITHUB_OUTPUT
-        echo "Generated tag name: $TAG_NAME"
+      - name: Combine Markdown folder-by-folder
+        run: |
+          mkdir -p build
+          OUTPUT_FILE="build/combined.md"
+          echo "" > "$OUTPUT_FILE"
 
-    - name: Release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ steps.create_tag.outputs.TAG_NAME }}
-        files: pdfs/**/*.pdf
+          for dir in $(find . -type d -not -path '*/\.*' -not -path './build*' -not -path '.'); do
+            FILES=$(find "$dir" -maxdepth 1 -name "*.md" | sort)
+            if [ -n "$FILES" ]; then
+              HEADING="# $(basename $dir)"
+              echo -e "\n$HEADING\n" >> "$OUTPUT_FILE"
+              cat $FILES >> "$OUTPUT_FILE"
+              echo -e "\n\n" >> "$OUTPUT_FILE"
+            fi
+          done
+
+      - name: Convert combined Markdown to PDF with ToC
+        run: |
+          mkdir -p build/final
+          pandoc build/combined.md \
+            --toc \
+            --toc-depth=3 \
+            -V geometry:a4paper \
+            -V fontsize=11pt \
+            -o build/final/combined.pdf
+
+      - name: Set version (date + short SHA)
+        id: set_version
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          VERSION="v${DATE}-${SHORT_SHA}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.set_version.outputs.version }}
+          name: "Release ${{ steps.set_version.outputs.version }}"
+          files: build/final/combined.pdf
