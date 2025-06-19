@@ -11,16 +11,52 @@ on:
       - "labs/**/*.md"
 
 jobs:
-  converttopdf:
-    name: Build PDF
+  convert-and-release:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-        name: Checkout repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch all history for all branches and tags
 
-      - name: Uploade artifact
-        uses: actions/upload-pages-artifact@v3
+    - name: Install Pandoc and LaTeX
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y pandoc texlive-latex-base texlive-fonts-recommended texlive-extra-utils texlive-latex-extra
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+    - name: Convert Markdown to PDF
+      run: |
+        mkdir -p pdfs
+        for md_file in $(find . -name "*.md"); do
+          pandoc "$md_file" -o "pdfs/${md_file%.md}.pdf"
+        done
+
+    - name: Create Release Tag
+      id: create_tag
+      run: |
+        # Generate a tag name based on the current date and short commit hash
+        TAG_NAME="release-$(date +'%Y%m%d')-$(git rev-parse --short HEAD)"
+        echo "TAG_NAME=$TAG_NAME" >> $GITHUB_OUTPUT
+        echo "Generated tag name: $TAG_NAME"
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.create_tag.outputs.TAG_NAME }}
+        release_name: Release ${{ steps.create_tag.outputs.TAG_NAME }}
+        draft: false
+        prerelease: false
+
+    - name: Upload PDFs to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./pdfs/
+        asset_name: markdown-pdfs.zip
+        asset_content_type: application/zip
