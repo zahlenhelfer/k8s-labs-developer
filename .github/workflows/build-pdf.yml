@@ -20,6 +20,14 @@ jobs:
       with:
         fetch-depth: 0  # Fetch all history for all branches and tags
 
+    - name: Cache apt packages
+      uses: actions/cache@v3
+      with:
+        path: /var/cache/apt
+        key: ${{ runner.os }}-apt-${{ hashFiles('**/apt-cache-key') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-
+
     - name: Install Pandoc and LaTeX
       run: |
         sudo apt-get update
