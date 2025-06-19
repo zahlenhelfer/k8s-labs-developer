@@ -1,5 +1,5 @@
 
-## 🛠️ Übung: Security Context in einem Pod konfigurieren
+## 🧪 Übung: Security Context in einem Pod konfigurieren
 
 ### 🎯 Ziel
 
