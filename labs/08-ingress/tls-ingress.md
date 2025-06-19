@@ -1,5 +1,5 @@
 
-## 🛠️ **Übung: TLS-Zertifikat für Ingress via Secret**
+## 🧪 Übung: TLS-Zertifikat für Ingress via Secrets
 
 ### 🎯 Ziel
 
