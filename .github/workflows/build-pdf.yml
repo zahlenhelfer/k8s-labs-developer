@@ -29,8 +29,18 @@ jobs:
       run: |
         mkdir -p pdfs
         for md_file in $(find . -name "*.md"); do
-          pandoc "$md_file" -o "pdfs/${md_file%.md}.pdf"
+          echo "Converting $md_file to PDF..."
+          # Create the directory structure for the PDF file
+          pdf_dir="pdfs/$(dirname "${md_file}")"
+          mkdir -p "$pdf_dir"
+          if pandoc "$md_file" -o "${pdf_dir}/${md_file%.md}.pdf"; then
+            echo "Successfully converted $md_file"
+          else
+            echo "Failed to convert $md_file"
+            exit 1
+          fi
         done
+      continue-on-error: false
 
     - name: Create Release Tag
       id: create_tag
