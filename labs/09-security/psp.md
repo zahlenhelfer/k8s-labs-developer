@@ -1,5 +1,5 @@
 
-## 🛠️ Übung: Pod Security Standards in Kubernetes aktivieren und testen
+## 🧪 Übung: Pod Security Standards in Kubernetes aktivieren und testen
 
 ---
 
