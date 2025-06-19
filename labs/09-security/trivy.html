@@ -1,0 +1,48 @@
+<h1 id="übung-trivy-installieren-und-nginx-docker-image-scannen">🧪
+Übung: Trivy installieren und nginx Docker-Image scannen</h1>
+<hr />
+<h2 id="ziel">🎯 Ziel</h2>
+<ul>
+<li>Trivy installieren</li>
+<li>Docker-Image <code>nginx</code> herunterladen</li>
+<li>Image mit Trivy auf Schwachstellen prüfen</li>
+</ul>
+<hr />
+<h2 id="schritt-1-trivy-installieren">📁 Schritt 1: Trivy
+installieren</h2>
+<h3 id="linux-debianubuntu">Linux (Debian/Ubuntu)</h3>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install <span class="at">-y</span> wget apt-transport-https gnupg lsb-release</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> <span class="at">-qO</span> <span class="at">-</span> https://aquasecurity.github.io/trivy-repo/deb/public.key <span class="kw">|</span> <span class="fu">sudo</span> apt-key add <span class="at">-</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> deb https://aquasecurity.github.io/trivy-repo/deb <span class="va">$(</span><span class="ex">lsb_release</span> <span class="at">-sc</span><span class="va">)</span> main <span class="kw">|</span> <span class="fu">sudo</span> tee /etc/apt/sources.list.d/trivy.list</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get update</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt-get install trivy</span></code></pre></div>
+<h3 id="alternativ-trivy-als-binary-herunterladen">Alternativ: Trivy als
+Binary herunterladen</h3>
+<p><a
+href="https://github.com/aquasecurity/trivy/releases">https://github.com/aquasecurity/trivy/releases</a></p>
+<hr />
+<h2 id="schritt-2-docker-image-herunterladen">📁 Schritt 2: Docker-Image
+herunterladen</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> pull nginx</span></code></pre></div>
+<hr />
+<h2 id="schritt-3-image-mit-trivy-scannen">📁 Schritt 3: Image mit Trivy
+scannen</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">trivy</span> image nginx</span></code></pre></div>
+<p>Du bekommst eine Liste von gefundenen Schwachstellen mit Details zu
+Schweregrad, CVE-ID, Beschreibung.</p>
+<hr />
+<h2 id="schritt-4-optionale-parameter">📁 Schritt 4: Optionale
+Parameter</h2>
+<ul>
+<li>Nur Schwachstellen ab hohem Schweregrad sehen:</li>
+</ul>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">trivy</span> image <span class="at">--severity</span> HIGH,CRITICAL nginx</span></code></pre></div>
+<ul>
+<li>Nur Ergebnis im JSON-Format ausgeben:</li>
+</ul>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">trivy</span> image <span class="at">--format</span> json nginx</span></code></pre></div>

@@ -1,0 +1,109 @@
+<h2 id="übung-security-context-in-einem-pod-konfigurieren">🧪 Übung:
+Security Context in einem Pod konfigurieren</h2>
+<h3 id="ziel">🎯 Ziel</h3>
+<ul>
+<li>Einen Pod mit Security Context anlegen</li>
+<li>Benutzer-ID (UID) und Gruppen-ID (GID) setzen</li>
+<li>Laufzeit-Einschränkungen (z.B. kein root, read-only FS)
+aktivieren</li>
+</ul>
+<hr />
+<h2 id="schritt-1-beispiel-pod-mit-security-context">📁 Schritt 1:
+Beispiel-Pod mit Security Context</h2>
+<p>Erstelle die Datei <code>pod-securitycontext.yaml</code>:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Pod</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> secure-pod</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">securityContext</span><span class="kw">:</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runAsUser</span><span class="kw">:</span><span class="at"> </span><span class="dv">1000</span><span class="co">          # User ID, unter der der Container läuft</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runAsGroup</span><span class="kw">:</span><span class="at"> </span><span class="dv">3000</span><span class="co">         # Gruppen ID</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">fsGroup</span><span class="kw">:</span><span class="at"> </span><span class="dv">2000</span><span class="co">            # Gruppen ID für Volumes (Dateisystem)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runAsNonRoot</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">       # Container darf nicht als root laufen</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> busybox</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> busybox</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">&quot;sh&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;-c&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;sleep 3600&quot;</span><span class="kw">]</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">securityContext</span><span class="kw">:</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">readOnlyRootFilesystem</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">  # Root-Dateisystem ist schreibgeschützt</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">allowPrivilegeEscalation</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co">  # Keine Privilege Escalation erlaubt</span></span></code></pre></div>
+<hr />
+<h2 id="schritt-2-pod-erstellen">📁 Schritt 2: Pod erstellen</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> pod-securitycontext.yaml</span></code></pre></div>
+<hr />
+<h2 id="schritt-3-pod-prüfen">📁 Schritt 3: Pod prüfen</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pods secure-pod</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> describe pod secure-pod</span></code></pre></div>
+<hr />
+<h2 id="schritt-4-in-den-pod-rein">📁 Schritt 4: In den Pod rein</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> exec <span class="at">-it</span> secure-pod <span class="at">--</span> sh</span></code></pre></div>
+<p>Überprüfe User und Rechte:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">id</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> /tmp/testfile  <span class="co"># sollte funktionieren (tmp ist schreibbar)</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> /root/testfile <span class="co"># sollte **fehlschlagen** (read-only root FS)</span></span></code></pre></div>
+<hr />
+<h2 id="erklärung">🧠 Erklärung</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 74%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Feld</th>
+<th>Bedeutung</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>runAsUser</code></td>
+<td>User-ID, unter der der Container läuft</td>
+</tr>
+<tr class="even">
+<td><code>runAsGroup</code></td>
+<td>Gruppen-ID für den Prozess</td>
+</tr>
+<tr class="odd">
+<td><code>fsGroup</code></td>
+<td>Gruppen-ID, die auf gemounteten Volumes gesetzt wird (für
+Dateisystemrechte)</td>
+</tr>
+<tr class="even">
+<td><code>runAsNonRoot</code></td>
+<td>Erzwingt, dass der Container nicht als root läuft</td>
+</tr>
+<tr class="odd">
+<td><code>readOnlyRootFilesystem</code></td>
+<td>Root-Dateisystem wird schreibgeschützt</td>
+</tr>
+<tr class="even">
+<td><code>allowPrivilegeEscalation</code></td>
+<td>Verbietet Privilegien-Erweiterung im Container</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="optional-pod-ohne-security-context-für-vergleich">📁 Optional:
+Pod ohne Security Context für Vergleich</h2>
+<p>Erstelle <code>pod-no-seccontext.yaml</code>:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Pod</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> insecure-pod</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> busybox</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> busybox</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">&quot;sh&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;-c&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;sleep 3600&quot;</span><span class="kw">]</span></span></code></pre></div>
+<p>Dann:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> pod-no-seccontext.yaml</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> exec <span class="at">-it</span> insecure-pod <span class="at">--</span> sh</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">id</span></span></code></pre></div>
+<p>Hier läuft der Container meist als root (UID 0).</p>

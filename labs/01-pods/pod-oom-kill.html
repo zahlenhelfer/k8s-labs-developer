@@ -1,0 +1,90 @@
+<h1 id="erweiterte-übung-oomkill-out-of-memory-kill-provozieren">💥
+<strong>Erweiterte Übung: OOMKill (Out Of Memory Kill)
+provozieren</strong></h1>
+<h2 id="ziel">🎯 Ziel</h2>
+<ul>
+<li>Einen Pod mit einer <strong>bewusst niedrigen
+Speichergrenze</strong> erstellen.</li>
+<li>Ein Skript ausführen, das zu viel RAM nutzt.</li>
+<li>Beobachten, wie Kubernetes den Container killt.</li>
+</ul>
+<hr />
+<h2 id="schritt-1-yaml-datei-oomkill-pod.yaml">📁 Schritt 1: YAML-Datei
+<code>oomkill-pod.yaml</code></h2>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Pod</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> oom-demo</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> memory-hog</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> python:3.12-slim</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">&quot;python3&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;-c&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;a = [&#39;x&#39; * 1024 * 1024 * 1024] * 200; import time; time.sleep(30)&quot;</span><span class="kw">]</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">limits</span><span class="kw">:</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;50Mi&quot;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">cpu</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;100m&quot;</span></span></code></pre></div>
+<p><strong>Erklärung:</strong></p>
+<ul>
+<li>Das Python-Kommando erstellt eine Liste mit ~200 MB an Daten.</li>
+<li>Der Speicher-Limit liegt aber bei nur <strong>50 MiB</strong>.</li>
+<li>Das führt zu einem <strong>OOMKill durch das
+Kubernetes-System</strong>.</li>
+</ul>
+<hr />
+<h2 id="schritt-2-pod-starten">🚀 Schritt 2: Pod starten</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> oomkill-pod.yaml</span></code></pre></div>
+<hr />
+<h2 id="schritt-3-beobachte-das-verhalten">⏱️ Schritt 3: Beobachte das
+Verhalten</h2>
+<p>Gib dem Pod ein paar Sekunden, dann prüfe den Status:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pod oom-demo</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> describe pod oom-demo</span></code></pre></div>
+<p>Du solltest sehen:</p>
+<pre><code>State:          Terminated
+Reason:         OOMKilled</code></pre>
+<hr />
+<h2 id="schritt-4-verständnis-vertiefen">🧠 Schritt 4: Verständnis
+vertiefen</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pod oom-demo <span class="at">-o</span> jsonpath=<span class="st">&#39;{.status.containerStatuses[0].lastState.terminated.reason}&#39;</span></span></code></pre></div>
+<p>Gibt <code>"OOMKilled"</code> zurück, wenn Kubernetes den Container
+aufgrund von zu hohem Speicherverbrauch beendet hat.</p>
+<hr />
+<h2 id="schritt-5-aufräumen">🧹 Schritt 5: Aufräumen</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete pod oom-demo</span></code></pre></div>
+<hr />
+<h2 id="was-du-hier-gelernt-hast">📚 Was Du hier gelernt hast</h2>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 83%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Konzept</th>
+<th>Bedeutung</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>OOMKilled</strong></td>
+<td>Container wurde durch das Betriebssystem beendet, da er das
+Speicherlimit überschritten hat.</td>
+</tr>
+<tr class="even">
+<td><strong>Limits</strong></td>
+<td>Ressourcen-Grenzen sind real – beim Überschreiten greift Kubernetes
+hart durch.</td>
+</tr>
+<tr class="odd">
+<td><strong>Fehlerdiagnose</strong></td>
+<td>Du lernst zu erkennen, ob ein Container durch OOM abgeschossen
+wurde.</td>
+</tr>
+</tbody>
+</table>

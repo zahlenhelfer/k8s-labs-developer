@@ -1,0 +1,99 @@
+<h1 id="übung-docker-image-für-eine-einfache-go-app-erstellen">🛠️ Übung:
+Docker-Image für eine einfache Go-App erstellen</h1>
+<hr />
+<h2 id="ziel">🎯 Ziel</h2>
+<ul>
+<li>Eine kleine Go-Anwendung schreiben</li>
+<li>Ein Dockerfile für diese App erstellen</li>
+<li>Ein Docker-Image bauen und lokal testen</li>
+</ul>
+<hr />
+<h2 id="schritt-1-go-app-schreiben">📁 Schritt 1: Go-App schreiben</h2>
+<ul>
+<li>Erstelle eine Datei <code>main.go</code> mit folgendem Inhalt:</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">package</span> main</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">import</span> <span class="op">(</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;net/http&quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> handler<span class="op">(</span>w http<span class="op">.</span>ResponseWriter<span class="op">,</span> r <span class="op">*</span>http<span class="op">.</span>Request<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  fmt<span class="op">.</span>Fprintf<span class="op">(</span>w<span class="op">,</span> <span class="st">&quot;Hallo von der Go-App!&quot;</span><span class="op">)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> main<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  http<span class="op">.</span>HandleFunc<span class="op">(</span><span class="st">&quot;/&quot;</span><span class="op">,</span> handler<span class="op">)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  fmt<span class="op">.</span>Println<span class="op">(</span><span class="st">&quot;Starte Server auf :8080&quot;</span><span class="op">)</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  http<span class="op">.</span>ListenAndServe<span class="op">(</span><span class="st">&quot;:8080&quot;</span><span class="op">,</span> <span class="ot">nil</span><span class="op">)</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<ul>
+<li>Erstelle eine Datei <code>go.mod</code> mit folgendem Inhalt:</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>module example<span class="op">.</span>com<span class="op">/</span>simple<span class="op">-</span><span class="cf">go</span><span class="op">-</span>app</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">go</span> <span class="fl">1.22</span></span></code></pre></div>
+<hr />
+<h2 id="schritt-2-dockerfile-erstellen">📁 Schritt 2: Dockerfile
+erstellen</h2>
+<p>Erstelle eine Datei <code>Dockerfile</code> im selben
+Verzeichnis:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Start from the official Go image as the build stage</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> golang:1.22 <span class="kw">AS</span> builder</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Set the working directory inside the container</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">WORKDIR</span> /app</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy go mod and sum files</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> go.mod ./</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Download dependencies</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">go</span> mod download</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy the source code</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> . .</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Build the Go app</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="va">CGO_ENABLED</span><span class="op">=</span>0 <span class="ex">go</span> build <span class="at">-o</span> main .</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Use a minimal base image (distroless or alpine) for the final container</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> debian:bullseye-slim</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Set working directory in the new container</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="kw">WORKDIR</span> /root/</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy the binary from the builder stage</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> <span class="op">--from=builder</span> /app/main .</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Expose the application port</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPOSE</span> 8080</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Command to run the executable</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="kw">CMD</span> [<span class="st">&quot;./main&quot;</span>]</span></code></pre></div>
+<hr />
+<h2 id="schritt-3-docker-image-bauen">📁 Schritt 3: Docker Image
+bauen</h2>
+<p>Im Verzeichnis mit <code>main.go</code> und
+<code>Dockerfile</code>:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> go-simple-app .</span></code></pre></div>
+<hr />
+<h2 id="schritt-4-docker-container-starten">📁 Schritt 4: Docker
+Container starten</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-dit</span> <span class="at">--name</span> go-app <span class="at">-p</span> 8080:8080 go-simple-app</span></code></pre></div>
+<hr />
+<h2 id="schritt-5-test-im-browser-oder-mit-curl">📁 Schritt 5: Test im
+Browser oder mit curl</h2>
+<p>Öffne im Browser oder mit curl:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:8080</span></code></pre></div>
+<p>Antwort sollte sein:</p>
+<pre><code>Hallo von der Go-App!</code></pre>
+<hr />
+<h2 id="schritt-6-aufräumen">📁 Schritt 6: Aufräumen</h2>
+<p>Stoppe den Container:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> container rm <span class="at">-f</span> go-app</span></code></pre></div>

@@ -1,0 +1,76 @@
+<h1
+id="übung-erstelle-einen-einfachen-pod-simple-nginx-pod-in-kubernetes">🛠️
+<strong>Übung: Erstelle einen einfachen Pod
+<code>simple-nginx-pod</code> in Kubernetes</strong></h1>
+<h2 id="ziel">🎯 Ziel</h2>
+<ul>
+<li>Einen Pod mit dem Namen <code>simple-nginx-pod</code>
+erstellen.</li>
+<li>Das Standard-Nginx-Image verwenden.</li>
+<li>Den Status und die Logs des Pods prüfen.</li>
+</ul>
+<hr />
+<h2 id="schritt-1-yaml-datei-für-den-pod-schreiben">🧩 Schritt 1:
+YAML-Datei für den Pod schreiben</h2>
+<p>Erstelle eine Datei namens <code>simple-nginx-pod.yaml</code> mit
+folgendem Inhalt:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Pod</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> simple-nginx-pod</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> nginx-container</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> nginx:latest</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ports</span><span class="kw">:</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">containerPort</span><span class="kw">:</span><span class="at"> </span><span class="dv">80</span></span></code></pre></div>
+<hr />
+<h2 id="schritt-2-pod-erstellen">🧩 Schritt 2: Pod erstellen</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> simple-nginx-pod.yaml</span></code></pre></div>
+<hr />
+<h2 id="schritt-3-pod-status-überprüfen">🧩 Schritt 3: Pod-Status
+überprüfen</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pod simple-nginx-pod</span></code></pre></div>
+<p>Wenn der Pod läuft, sollte <code>STATUS</code> auf
+<code>Running</code> stehen.</p>
+<hr />
+<h2 id="schritt-4-details-anzeigen">🧩 Schritt 4: Details anzeigen</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> describe pod simple-nginx-pod</span></code></pre></div>
+<p>Hier siehst du Events, Container-Status und weitere Details.</p>
+<hr />
+<h2 id="schritt-5-logs-anzeigen">🧩 Schritt 5: Logs anzeigen</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> logs simple-nginx-pod</span></code></pre></div>
+<p>Dies zeigt dir die Standard-Logs des Nginx-Webservers.</p>
+<hr />
+<h2 id="schritt-6-interaktiv-in-den-container-gehen-optional">🧩 Schritt
+6: Interaktiv in den Container gehen (optional)</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> exec <span class="at">-it</span> simple-nginx-pod <span class="at">--</span> /bin/bash</span></code></pre></div>
+<p>Du kannst z. B. mit <code>curl localhost</code> im Container prüfen,
+ob Nginx antwortet.</p>
+<p>Um den Container zu verlassen bitte <code>exit</code> eingeben.</p>
+<hr />
+<h2 id="schritt-7-testen-ob-nginx-von-außen-erreichbar-ist-optional">🧩
+Schritt 7: Testen, ob Nginx von außen erreichbar ist (optional)</h2>
+<p>Wenn du einen Port weiterleiten möchtest:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> port-forward pod/simple-nginx-pod 8080:80</span></code></pre></div>
+<p>Dann kannst du im Browser <code>http://localhost:8080</code>
+aufrufen.</p>
+<hr />
+<h2 id="schritt-8-aufräumen">🧹 Schritt 8: Aufräumen</h2>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete pod simple-nginx-pod</span></code></pre></div>
+<hr />
+<h2 id="was-hast-du-gelernt">📚 Was hast Du gelernt</h2>
+<ul>
+<li>Wie man einen Pod mit einem Container erstellt.</li>
+<li>Wie man Kubernetes-Ressourcen beschreibt, überprüft und mit ihnen
+interagiert.</li>
+<li>Wie man einfache Fehlerdiagnose und Portweiterleitung macht.</li>
+</ul>

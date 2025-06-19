@@ -1,0 +1,118 @@
+<h2 id="übung-kubernetes-deployment-mit-rollout-rollback">🛠️
+<strong>Übung: Kubernetes Deployment mit Rollout &amp;
+Rollback</strong></h2>
+<h3 id="ziel">🎯 Ziel</h3>
+<ul>
+<li>Ein NGINX Deployment erstellen.</li>
+<li>Ein Update durchführen und Rollout-History ansehen.</li>
+<li>Einen Fehler provozieren und per <strong>Rollback</strong>
+zurückgehen.</li>
+</ul>
+<hr />
+<h3 id="schritt-1-nginx-deployment.yaml">📁 Schritt 1:
+<code>nginx-deployment.yaml</code></h3>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> apps/v1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Deployment</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> nginx-deployment</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">replicas</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">revisionHistoryLimit</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">selector</span><span class="kw">:</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">matchLabels</span><span class="kw">:</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">app</span><span class="kw">:</span><span class="at"> nginx</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">template</span><span class="kw">:</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">labels</span><span class="kw">:</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">app</span><span class="kw">:</span><span class="at"> nginx</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> nginx</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">image</span><span class="kw">:</span><span class="at"> nginx:1.21</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">ports</span><span class="kw">:</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">containerPort</span><span class="kw">:</span><span class="at"> </span><span class="dv">80</span></span></code></pre></div>
+<hr />
+<h3 id="schritt-2-deployment-starten">🚀 Schritt 2: Deployment
+starten</h3>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> nginx-deployment.yaml</span></code></pre></div>
+<p>Dann prüfen:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get deployment nginx-deployment</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pods <span class="at">-l</span> app=nginx</span></code></pre></div>
+<hr />
+<h3 id="schritt-3-rollout-history-prüfen">🔍 Schritt 3: Rollout-History
+prüfen</h3>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> rollout history deployment nginx-deployment</span></code></pre></div>
+<p>→ Du siehst <code>REVISION 1</code></p>
+<hr />
+<h3 id="schritt-4-update-durchführen-z.-b.-neue-nginx-version">🧪
+Schritt 4: Update durchführen (z. B. neue NGINX-Version)</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> set image deployment nginx-deployment nginx=nginx:1.25</span></code></pre></div>
+<p>Dann prüfen:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> rollout status deployment nginx-deployment</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> rollout history deployment nginx-deployment</span></code></pre></div>
+<p>→ Jetzt hast du <code>REVISION 2</code></p>
+<hr />
+<h3 id="schritt-5-fehlerhafte-version-einspielen">💥 Schritt 5:
+Fehlerhafte Version einspielen</h3>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> set image deployment nginx-deployment nginx=nginx:doesnotexist</span></code></pre></div>
+<p>Prüfe:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> rollout status deployment nginx-deployment</span></code></pre></div>
+<p>→ Rollout <strong>hängt</strong>, weil das Image nicht existiert.
+Bitte die Ausgabe mit <code>Control+C</code> verlassen</p>
+<hr />
+<h3 id="schritt-6-rollback">↩︎️ Schritt 6: Rollback</h3>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> rollout undo deployment nginx-deployment</span></code></pre></div>
+<p>Danach prüfen:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pods <span class="at">-l</span> app=nginx</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> rollout history deployment nginx-deployment</span></code></pre></div>
+<p>→ Zurück auf <code>nginx:1.25</code> (REVISION 2) -&gt; die dann als
+(REVISION 4) geführt wird</p>
+<p>Optional: Rollback auf eine konkrete Revision:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> rollout undo deployment nginx-deployment <span class="at">--to-revision</span><span class="op">=</span>1</span></code></pre></div>
+<hr />
+<h3 id="schritt-7-aufräumen">🧹 Schritt 7: Aufräumen</h3>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete <span class="at">-f</span> nginx-deployment.yaml</span></code></pre></div>
+<hr />
+<h3 id="wichtiges-wissen">🧠 Wichtiges Wissen</h3>
+<table>
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 69%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Befehl</th>
+<th>Bedeutung</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>kubectl rollout history</code></td>
+<td>Zeigt dir vergangene Revisionen</td>
+</tr>
+<tr class="even">
+<td><code>kubectl rollout undo</code></td>
+<td>Macht den letzten oder einen bestimmten Rollout rückgängig</td>
+</tr>
+<tr class="odd">
+<td><code>kubectl set image</code></td>
+<td>Update des Deployments</td>
+</tr>
+<tr class="even">
+<td><code>revisionHistoryLimit</code></td>
+<td>Wie viele alte Revisionen Kubernetes speichert</td>
+</tr>
+</tbody>
+</table>

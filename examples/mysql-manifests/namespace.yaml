@@ -1,9 +1,0 @@
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: my-app
-  labels:
-    owner: marcus
-    env: development
-    costcenter: "4711"

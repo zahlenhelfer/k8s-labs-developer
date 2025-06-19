@@ -1,0 +1,87 @@
+<h1 id="übung-resource-requests-limits-für-einen-pod-setzen">🛠️
+<strong>Übung: Resource Requests &amp; Limits für einen Pod
+setzen</strong></h1>
+<h2 id="ziel">🎯 Ziel</h2>
+<ul>
+<li>Einen Pod mit <strong>CPU- und Speicher-Limits</strong>
+erstellen.</li>
+<li>Die Auswirkungen der Ressourcenbeschränkung beobachten.</li>
+<li>Die Konfiguration mit <code>kubectl</code> prüfen.</li>
+</ul>
+<hr />
+<h2 id="schritt-1-erstelle-eine-datei-resource-limits-pod.yaml">📁
+Schritt 1: Erstelle eine Datei
+<code>resource-limits-pod.yaml</code></h2>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Pod</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> limited-nginx-pod</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> nginx</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> nginx:latest</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">requests</span><span class="kw">:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;64Mi&quot;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">cpu</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;100m&quot;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">limits</span><span class="kw">:</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">memory</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;128Mi&quot;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">cpu</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;200m&quot;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ports</span><span class="kw">:</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">containerPort</span><span class="kw">:</span><span class="at"> </span><span class="dv">80</span></span></code></pre></div>
+<p><strong>Erklärung:</strong></p>
+<ul>
+<li><strong>Requests</strong>: Garantierte minimale Ressourcen.</li>
+<li><strong>Limits</strong>: Maximal erlaubte Ressourcen.</li>
+<li><code>100m</code> CPU = 0.1 CPU-Kerne.</li>
+</ul>
+<hr />
+<h2 id="schritt-2-pod-anwenden">🚀 Schritt 2: Pod anwenden</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> resource-limits-pod.yaml</span></code></pre></div>
+<hr />
+<h2 id="schritt-3-status-und-ressourcen-prüfen">🔍 Schritt 3: Status und
+Ressourcen prüfen</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pod limited-nginx-pod</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> describe pod limited-nginx-pod</span></code></pre></div>
+<p>Suche im Output nach dem Abschnitt <code>Limits</code> und
+<code>Requests</code>.</p>
+<hr />
+<h2 id="schritt-4-ressourcenverhalten-testen-optional">🧪 Schritt 4:
+Ressourcenverhalten testen (optional)</h2>
+<p>Installiere <code>stress</code> im Container (nur zu
+Testzwecken):</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> exec <span class="at">-it</span> limited-nginx-pod <span class="at">--</span> apt update</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> exec <span class="at">-it</span> limited-nginx-pod <span class="at">--</span> apt install <span class="at">-y</span> stress</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> exec <span class="at">-it</span> limited-nginx-pod <span class="at">--</span> stress <span class="at">--cpu</span> 2 <span class="at">--timeout</span> 30</span></code></pre></div>
+<p>→ Du wirst feststellen, dass die CPU durch das Limit auf 200m
+beschränkt wird. Im echten Cluster mit aktivem <strong>Kubelet und
+Cgroups</strong> wird der Container “gedrosselt”.</p>
+<hr />
+<h2 id="bonus-nutzung-überwachen-mit-metrics-server">📈 Bonus: Nutzung
+überwachen (mit Metrics-Server)</h2>
+<p>Metric-Server installieren:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml</span></code></pre></div>
+<p>Wenn du den <a
+href="https://github.com/kubernetes-sigs/metrics-server">metrics-server</a>
+installiert hast:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> top pod limited-nginx-pod</span></code></pre></div>
+<p>→ Zeigt aktuelle CPU- und Speicherwerte des Pods.</p>
+<hr />
+<h2 id="schritt-5-aufräumen">🧹 Schritt 5: Aufräumen</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete pod limited-nginx-pod</span></code></pre></div>
+<hr />
+<h2 id="was-du-lernst">📚 Was du lernst</h2>
+<ul>
+<li>Unterschied zwischen <code>requests</code> (Garantien) und
+<code>limits</code> (Obergrenzen).</li>
+<li>Wie Kubernetes Ressourcen verwaltet.</li>
+<li>Warum Limits wichtig sind (Stabilität, Fairness,
+Node-Auslastung).</li>
+</ul>

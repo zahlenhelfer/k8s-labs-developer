@@ -1,0 +1,78 @@
+<h1
+id="übung-replicaset-verliert-kontrolle-über-pod-durch-label-änderung">🧪
+Übung: ReplicaSet verliert Kontrolle über Pod durch Label-Änderung</h1>
+<hr />
+<h2 id="ziel">🎯 Ziel</h2>
+<ul>
+<li>Beobachten, wie ein ReplicaSet auf eine
+<strong>Labeländerung</strong> eines verwalteten Pods reagiert</li>
+<li>Verstehen, wie wichtig <code>matchLabels</code> für die Replikation
+ist</li>
+</ul>
+<hr />
+<h2 id="schritt-1-replicaset-erstellen">📁 Schritt 1: ReplicaSet
+erstellen</h2>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rs-demo.yaml</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> apps/v1</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> ReplicaSet</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> rs-demo</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">replicas</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">selector</span><span class="kw">:</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">matchLabels</span><span class="kw">:</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">app</span><span class="kw">:</span><span class="at"> demo</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">template</span><span class="kw">:</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">labels</span><span class="kw">:</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">app</span><span class="kw">:</span><span class="at"> demo</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> nginx</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">image</span><span class="kw">:</span><span class="at"> nginx</span></span></code></pre></div>
+<p>Anwenden:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> rs-demo.yaml</span></code></pre></div>
+<hr />
+<h2 id="schritt-2-pod-und-labels-prüfen">📁 Schritt 2: Pod und Labels
+prüfen</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pods <span class="at">--show-labels</span></span></code></pre></div>
+<blockquote>
+<p>Du siehst einen Pod mit dem Label <code>app=demo</code>.</p>
+</blockquote>
+<hr />
+<h2 id="schritt-3-label-ändern-pod-entkoppeln">📁 Schritt 3: Label
+ändern (Pod “entkoppeln”)</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">POD</span><span class="op">=</span><span class="va">$(</span><span class="ex">kubectl</span> get pods <span class="at">-l</span> app=demo <span class="at">-o</span> jsonpath=<span class="st">&#39;{.items[0].metadata.name}&#39;</span><span class="va">)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> label pod <span class="va">$POD</span> app=foo <span class="at">--overwrite</span></span></code></pre></div>
+<hr />
+<h2 id="schritt-4-verhalten-beobachten">📁 Schritt 4: Verhalten
+beobachten</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pods <span class="at">--show-labels</span></span></code></pre></div>
+<blockquote>
+<p>🔍 Du siehst jetzt <strong>zwei Pods</strong>:</p>
+<ul>
+<li>Der alte Pod mit <code>app=foo</code> – wird <strong>nicht mehr vom
+ReplicaSet verwaltet</strong></li>
+<li>Ein <strong>neuer Pod mit <code>app=demo</code></strong>, weil das
+ReplicaSet wieder einen Pod braucht, der seinem <code>selector</code>
+entspricht.</li>
+</ul>
+</blockquote>
+<hr />
+<h2 id="schritt-5-nachvollziehen">📁 Schritt 5: Nachvollziehen</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> describe rs rs-demo</span></code></pre></div>
+<ul>
+<li>Unter <code>Pods Status</code> siehst du: 1 aktuell kontrollierter
+Pod</li>
+<li>Der „entkoppelte“ Pod zählt nicht mehr dazu</li>
+</ul>
+<hr />
+<h2 id="schritt-6-aufräumen">🧹 Schritt 6: Aufräumen</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete rs rs-demo</span></code></pre></div>

@@ -1,0 +1,124 @@
+<h2 id="übung-cronjob-in-kubernetes">🛠️ <strong>Übung: CronJob in
+Kubernetes</strong></h2>
+<h3 id="ziel">🎯 Ziel</h3>
+<ul>
+<li>Einen CronJob erstellen, der alle 30 Sekunden (zum Testen) eine
+Nachricht ausgibt.</li>
+<li>Logs des CronJobs prüfen.</li>
+<li>Verhalten bei Fehlschlägen und Parallelism beobachten.</li>
+</ul>
+<hr />
+<h2 id="schritt-1-cronjob-erstellen">📁 Schritt 1: CronJob
+erstellen</h2>
+<h3 id="datei-hello-cronjob.yaml">Datei:
+<code>hello-cronjob.yaml</code></h3>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> batch/v1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> CronJob</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> hello-cronjob</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;*/1 * * * *&quot;</span><span class="co">  # jede Minute</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">jobTemplate</span><span class="kw">:</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">template</span><span class="kw">:</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> hello</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="fu">image</span><span class="kw">:</span><span class="at"> busybox</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="fu">args</span><span class="kw">:</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> /bin/sh</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> -c</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="at">            </span><span class="kw">-</span><span class="at"> echo &quot;📅 Hallo von CronJob um $(date)&quot;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">restartPolicy</span><span class="kw">:</span><span class="at"> OnFailure</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> hello-cronjob.yaml</span></code></pre></div>
+<hr />
+<h2 id="schritt-2-ausführungen-beobachten">🔍 Schritt 2: Ausführungen
+beobachten</h2>
+<p>Warte 1–2 Minuten, dann:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get cronjob hello-cronjob</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get jobs</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pods <span class="at">--selector</span><span class="op">=</span>job-name <span class="at">--sort-by</span><span class="op">=</span>.metadata.creationTimestamp</span></code></pre></div>
+<hr />
+<h2 id="schritt-3-logs-eines-cronjob-runs-ansehen">📂 Schritt 3: Logs
+eines CronJob-Runs ansehen</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pods  <span class="co"># z. B. hello-cronjob-xxxx</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> logs <span class="op">&lt;</span>PODNAME<span class="op">&gt;</span></span></code></pre></div>
+<p>→ Beispielausgabe:</p>
+<pre><code>📅 Hallo von CronJob um Mon Jun  6 10:00:00 UTC 2025</code></pre>
+<hr />
+<h2 id="schritt-4-fehler-simulieren">🧪 Schritt 4: Fehler
+simulieren</h2>
+<p>Ändere den CronJob so, dass der Container einen Fehler
+produziert:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">args</span><span class="kw">:</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> /bin/sh</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> -c</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> exit 1</span></span></code></pre></div>
+<p>→ Füge auch ein <code>backoffLimit: 1</code> hinzu:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">backoffLimit</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span></code></pre></div>
+<p>→ Neu anwenden:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> hello-cronjob.yaml</span></code></pre></div>
+<p>Dann prüfen:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get jobs</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> describe job <span class="op">&lt;</span>JOBNAME<span class="op">&gt;</span></span></code></pre></div>
+<p>→ Status zeigt <strong>“failed”</strong> nach 1 Versuch.</p>
+<hr />
+<h2 id="optional-ausführung-manuell-triggern">🧩 Optional: Ausführung
+manuell triggern</h2>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> create job <span class="at">--from</span><span class="op">=</span>cronjob/hello-cronjob manual-run</span></code></pre></div>
+<hr />
+<h2 id="aufräumen">🧹 Aufräumen</h2>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete cronjob hello-cronjob</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete jobs <span class="at">--all</span></span></code></pre></div>
+<hr />
+<h2 id="wichtiges-wissen">🧠 Wichtiges Wissen</h2>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 64%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Feld</th>
+<th>Bedeutung</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>schedule</code></td>
+<td>Cron-Syntax wie <code>* * * * *</code></td>
+</tr>
+<tr class="even">
+<td><code>restartPolicy</code></td>
+<td>Muss bei CronJobs <code>OnFailure</code> oder <code>Never</code>
+sein</td>
+</tr>
+<tr class="odd">
+<td><code>jobTemplate</code></td>
+<td>Enthält den eigentlichen Task</td>
+</tr>
+<tr class="even">
+<td><code>backoffLimit</code></td>
+<td>Anzahl Wiederholungen bei Fehler</td>
+</tr>
+<tr class="odd">
+<td><code>successfulJobsHistoryLimit</code></td>
+<td>Anzahl erfolgreicher Job-Runs, die behalten werden</td>
+</tr>
+<tr class="even">
+<td><code>failedJobsHistoryLimit</code></td>
+<td>Dasselbe für Fehlversuche</td>
+</tr>
+</tbody>
+</table>

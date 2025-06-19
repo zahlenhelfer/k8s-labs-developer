@@ -1,0 +1,60 @@
+<h1 id="übung-einfaches-helm-chart-erstellen-und-deployen">🧪 Übung:
+Einfaches Helm-Chart erstellen und deployen</h1>
+<hr />
+<h2 id="ziel">🎯 Ziel</h2>
+<ul>
+<li>Helm installieren und konfigurieren</li>
+<li>Ein eigenes Helm-Chart erstellen</li>
+<li>Deployment einer NGINX-App mit Helm</li>
+<li>Werte anpassen und Chart upgraden</li>
+</ul>
+<hr />
+<h2 id="schritt-1-helm-installieren">📁 Schritt 1: Helm
+installieren</h2>
+<p>Falls noch nicht installiert, <a
+href="https://helm.sh/docs/intro/install/">Helm installieren</a>.</p>
+<p>Prüfe:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> version</span></code></pre></div>
+<hr />
+<h2 id="schritt-2-neues-helm-chart-erstellen">📁 Schritt 2: Neues
+Helm-Chart erstellen</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> create my-nginx-chart</span></code></pre></div>
+<p>Dies legt einen Chart-Ordner <code>my-nginx-chart</code> mit
+Standardstruktur an.</p>
+<hr />
+<h2 id="schritt-3-chart-anpassen">📁 Schritt 3: Chart anpassen</h2>
+<ul>
+<li>Öffne <code>my-nginx-chart/values.yaml</code></li>
+<li>Passe z. B. den <code>replicaCount</code> an (z. B. auf 2)</li>
+</ul>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">replicaCount</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span></code></pre></div>
+<ul>
+<li>Optional: Unter <code>image</code> kannst du das NGINX-Image oder
+Tag ändern.</li>
+</ul>
+<hr />
+<h2 id="schritt-4-deployment-testen">📁 Schritt 4: Deployment
+testen</h2>
+<p>Im Kubernetes-Cluster (minikube, kind o.ä.):</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> create namespace demo</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> install my-nginx my-nginx-chart <span class="at">--namespace</span> demo</span></code></pre></div>
+<hr />
+<h2 id="schritt-5-deployment-prüfen">📁 Schritt 5: Deployment
+prüfen</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pods <span class="at">-n</span> demo</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get svc <span class="at">-n</span> demo</span></code></pre></div>
+<hr />
+<h2 id="schritt-6-werte-ändern-und-chart-upgraden">📁 Schritt 6: Werte
+ändern und Chart upgraden</h2>
+<p>Zum Beispiel Anzahl Replikate auf 3 ändern:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> upgrade my-nginx my-nginx-chart <span class="at">--namespace</span> demo <span class="at">--set</span> replicaCount=3</span></code></pre></div>
+<hr />
+<h2 id="schritt-7-release-löschen">📁 Schritt 7: Release löschen</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> uninstall my-nginx <span class="at">--namespace</span> demo</span></code></pre></div>

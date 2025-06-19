@@ -1,0 +1,94 @@
+<h1 id="übung-arbeiten-mit-helm-charts-in-kubernetes">🧪 Übung: Arbeiten
+mit Helm Charts in Kubernetes</h1>
+<hr />
+<h2 id="ziel">🎯 Ziel</h2>
+<ul>
+<li>Helm installieren (falls nötig)</li>
+<li>Ein öffentliches Helm-Chart (z. B. <code>bitnami/nginx</code>)
+verwenden</li>
+<li>Installation mit benutzerdefinierten Werten</li>
+<li>Werte inspizieren und anpassen</li>
+<li>Helm-Release wieder entfernen</li>
+</ul>
+<hr />
+<h2 id="voraussetzungen">🧰 Voraussetzungen</h2>
+<ul>
+<li><p>Ein laufender Kubernetes-Cluster (z. B. via Minikube, Kind,
+etc.)</p></li>
+<li><p>Helm installiert:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> version</span></code></pre></div></li>
+</ul>
+<p>Wenn nicht, installiere es: <a
+href="https://helm.sh/docs/intro/install/">https://helm.sh/docs/intro/install/</a></p>
+<hr />
+<h2 id="helm-repository-hinzufügen">📦 1. Helm-Repository
+hinzufügen</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> repo add bitnami https://charts.bitnami.com/bitnami</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> repo update</span></code></pre></div>
+<hr />
+<h2 id="chart-infos-ansehen">🔍 2. Chart-Infos ansehen</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> search repo bitnami/nginx</span></code></pre></div>
+<p>Optional: zeige die Standardwerte (Values):</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> show values bitnami/nginx <span class="op">&gt;</span> nginx-values.yaml</span></code></pre></div>
+<hr />
+<h2 id="helm-chart-installieren">🚀 3. Helm-Chart installieren</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> install my-nginx bitnami/nginx <span class="at">--set</span> service.type=NodePort</span></code></pre></div>
+<p>Wichtig:</p>
+<ul>
+<li><code>my-nginx</code> ist der Release-Name</li>
+<li><code>bitnami/nginx</code> ist das Chart</li>
+<li><code>--set</code> erlaubt dir Werte zu überschreiben</li>
+</ul>
+<hr />
+<h2 id="ressourcen-anzeigen">🔍 4. Ressourcen anzeigen</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get all</span></code></pre></div>
+<blockquote>
+<p>Du siehst: Pod, Service, Deployment, ReplicaSet</p>
+</blockquote>
+<p>Optional: die Werte des Releases inspizieren</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> get values my-nginx</span></code></pre></div>
+<hr />
+<h2 id="helm-chart-aktualisieren">✏️ 5. Helm-Chart aktualisieren</h2>
+<p>Du kannst Werte ändern z. B. über ein eigenes File:</p>
+<p><strong>nginx-custom-values.yaml</strong></p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">service</span><span class="kw">:</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> NodePort</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">nodePorts</span><span class="kw">:</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">http</span><span class="kw">:</span><span class="at"> </span><span class="dv">30080</span></span></code></pre></div>
+<p>Dann anwenden:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> upgrade my-nginx bitnami/nginx <span class="at">-f</span> nginx-custom-values.yaml</span></code></pre></div>
+<hr />
+<h2 id="zugriff-testen">🧪 6. Zugriff testen</h2>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">minikube</span> service my-nginx <span class="at">--url</span></span></code></pre></div>
+<p>Oder (wenn du kein Minikube nutzt):</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get svc my-nginx</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Dann manuell zu http://&lt;NodeIP&gt;:&lt;NodePort&gt; surfen</span></span></code></pre></div>
+<hr />
+<h2 id="helm-release-deinstallieren">🗑️ 7. Helm-Release
+deinstallieren</h2>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> uninstall my-nginx</span></code></pre></div>
+<p>Optional: Cache &amp; Repo aufräumen</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> repo remove bitnami</span></code></pre></div>
+<hr />
+<h2 id="fazit">🧠 Fazit</h2>
+<p>In dieser Übung hast du gelernt:</p>
+<ul>
+<li>Wie man ein Helm-Chart sucht, installiert und anpasst</li>
+<li>Wie man ein Release updated und wieder löscht</li>
+<li>Wie man mit <code>--set</code> oder <code>-f</code> Konfigurationen
+überschreibt</li>
+<li>Helm = mächtiger Paketmanager für Kubernetes</li>
+</ul>

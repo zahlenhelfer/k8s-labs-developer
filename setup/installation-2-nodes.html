@@ -1,0 +1,46 @@
+<h1 id="installation-eines-zwei-node-kubernetes-cluster">🧪:
+Installation eines zwei Node Kubernetes-Cluster</h1>
+<h2 id="login">Login:</h2>
+<ul>
+<li><code>ssh student@k8s-node-XX.dockerlabs.de</code></li>
+</ul>
+<h2 id="installiere-die-control-plane">Installiere die
+Control-Plane:</h2>
+<ul>
+<li>Login auf den ersten Server</li>
+<li>wechsel in das Verzeichnis:
+<code>cd LFD459/SOLUTIONS/s_02/</code></li>
+<li>starten des Scripts:
+<code>script -q -c "bash k8scp.sh" $HOME/controlplane.out</code></li>
+<li>bei der Frage
+<code>keep the local version currently installed</code> auswählen</li>
+<li>Kopieren des Join-Befehls <kubeadm join> aus der Log-Datei per grep:
+<code>grep -A1 "kubeadm join" controlplane.out</code></li>
+<li>Besipieloutput:
+<code>kubeadm join &lt;ip&gt;:6443 --token 1123 --discovery-token-ca-cert-hash sha256:16df252</code></li>
+<li>Installation der Auto-Completion:</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> source <span class="op">&lt;(</span><span class="ex">kubectl</span> completion bash<span class="op">)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> echo <span class="st">&quot;source &lt;(kubectl completion bash)&quot;</span> <span class="op">&gt;&gt;</span> <span class="va">$HOME</span>/.bashrc</span></code></pre></div>
+<ul>
+<li>Installation Prüfen:</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get nodes</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">NAME</span>         STATUS   ROLES           AGE   VERSION</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">k8s-node-0</span>   Ready    control-plane   11m   v1.33.1</span></code></pre></div>
+<ul>
+<li>Taint enfernen:
+<code>kubectl taint nodes --all node-role.kubernetes.io/control-plane-</code></li>
+</ul>
+<h2 id="installiere-den-worker">Installiere den Worker:</h2>
+<ul>
+<li>Login auf den zweiten Server</li>
+<li>wechsel in das Verzeichnis:
+<code>cd LFD459/SOLUTIONS/s_02/</code></li>
+<li><code>bash k8sWorker.sh</code></li>
+<li><code>sudo kubeadm join ...</code></li>
+<li>wechsel zur Control-Plane und wiederholtes:
+<code>kubectl get nodes</code></li>
+</ul>

@@ -1,0 +1,74 @@
+<h2 id="übung-erstelle-einen-pod-mit-liveness-probe-in-kubernetes">🛠️
+<strong>Übung: Erstelle einen Pod mit Liveness-Probe in
+Kubernetes</strong></h2>
+<h2 id="ziel">🎯 Ziel</h2>
+<ul>
+<li>Einen einfachen Pod mit einem HTTP-Service erstellen.</li>
+<li>Eine <strong>Liveness-Probe</strong> konfigurieren, die die
+Verfügbarkeit des Containers überwacht.</li>
+<li>Den Liveness-Check testen, indem du absichtlich den Check
+fehlschlagen lässt.</li>
+</ul>
+<hr />
+<h2 id="schritt-1-yaml-datei-für-den-pod-schreiben">🧩 Schritt 1:
+YAML-Datei für den Pod schreiben</h2>
+<p>Erstelle eine Datei namens <code>liveness-pod.yaml</code> mit
+folgendem Inhalt:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Pod</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> liveness-demo</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> webserver</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> nginx</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">ports</span><span class="kw">:</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">containerPort</span><span class="kw">:</span><span class="at"> </span><span class="dv">80</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">livenessProbe</span><span class="kw">:</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">httpGet</span><span class="kw">:</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">path</span><span class="kw">:</span><span class="at"> /</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">port</span><span class="kw">:</span><span class="at"> </span><span class="dv">80</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">initialDelaySeconds</span><span class="kw">:</span><span class="at"> </span><span class="dv">5</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">periodSeconds</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span></span></code></pre></div>
+<p><strong>Erläuterung:</strong></p>
+<ul>
+<li><code>httpGet</code> prüft den Pfad <code>/</code> auf Port 80.</li>
+<li><code>initialDelaySeconds</code>: Wartezeit vor dem ersten
+Check.</li>
+<li><code>periodSeconds</code>: Intervall für wiederholte Checks.</li>
+</ul>
+<hr />
+<h2 id="schritt-2-pod-erstellen">🧩 Schritt 2: Pod erstellen</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> liveness-pod.yaml</span></code></pre></div>
+<hr />
+<h2 id="schritt-3-status-prüfen">🧩 Schritt 3: Status prüfen</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> describe pod liveness-demo</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pod liveness-demo</span></code></pre></div>
+<p>Beobachte, ob der Pod stabil läuft.</p>
+<hr />
+<h2 id="schritt-4-liveness-absichtlich-fehlschlagen-lassen">🧪 Schritt
+4: Liveness absichtlich fehlschlagen lassen</h2>
+<p>Um den Check scheitern zu lassen, kannst du in den laufenden Pod
+eingreifen:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> exec <span class="at">-it</span> liveness-demo <span class="at">--</span> /bin/bash</span></code></pre></div>
+<p>Ersetze die nginx-Startseite durch etwas anderes oder lösche sie:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> /usr/share/nginx/html/index.html</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span></span></code></pre></div>
+<p>Jetzt sollte der Liveness-Check fehlschlagen, und Kubernetes startet
+den Container neu.</p>
+<hr />
+<h2 id="schritt-5-neustarts-beobachten">🔍 Schritt 5: Neustarts
+beobachten</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pod liveness-demo</span></code></pre></div>
+<p>Du solltest sehen, dass sich die Spalte <code>RESTARTS</code>
+erhöht.</p>
+<hr />
+<h2 id="aufräumen-pod-löschen">🧹 Aufräumen: Pod löschen</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete pod liveness-demo</span></code></pre></div>

@@ -1,0 +1,110 @@
+<h1 id="übung-dynamisches-provisionieren-mit-externem-nfs-share">🧪
+Übung: Dynamisches Provisionieren mit externem NFS-Share</h1>
+<hr />
+<h2 id="voraussetzungen">📘 Voraussetzungen</h2>
+<ul>
+<li>Der NFS-Server ist von deinen Kubernetes-Nodes aus
+<strong>netzwerkseitig erreichbar</strong>.</li>
+<li>Du nutzt Kubernetes &gt;= 1.20</li>
+<li>Du hast <code>nfs-subdir-external-provisioner</code> installiert
+oder willst ihn jetzt installieren (wird gleich erklärt).</li>
+</ul>
+<hr />
+<h2 id="ziel">✅ Ziel</h2>
+<ul>
+<li>Ein StorageClass-Objekt für NFS definieren</li>
+<li>NFS-Provisioner installieren (als dynamischer Storage-Broker)</li>
+<li>Eine PVC erstellen, die automatisch ein Verzeichnis unter
+<code>/student-share</code> nutzt</li>
+<li>Einen Pod starten, der das Volume nutzt</li>
+</ul>
+<hr />
+<h2 id="schritt-1-nfs-provisioner-installieren">📁 Schritt 1: NFS
+Provisioner installieren</h2>
+<p>Installation des NFS-Clients auf <strong>beiden</strong> Nodes
+(k8s-node-XX.dockerlabs.de) per
+<code>sudo apt install nfs-client -y</code></p>
+<p>Verwende den offiziellen Helm-Chart:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> repo update</span></code></pre></div>
+<p>Dann installieren wir den Provisioner in einem eigenen Namespace:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> create namespace nfs-storage</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> install nfs-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner <span class="dt">\</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--namespace</span> nfs-storage <span class="dt">\</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--set</span> nfs.server=nfs.dockerlabs.de <span class="dt">\</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--set</span> nfs.path=/srv/nfs/student-share <span class="dt">\</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--set</span> storageClass.name=nfs-client <span class="dt">\</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">--set</span> storageClass.defaultClass=false</span></code></pre></div>
+<p>Das erstellt:</p>
+<ul>
+<li>eine <code>Deployment</code> für den Provisioner</li>
+<li>eine <code>StorageClass</code> namens <code>nfs-client</code></li>
+<li>dynamische Volume-Verzeichnisse unter
+<code>/srv/nfs/student-share</code> für jede PVC</li>
+</ul>
+<hr />
+<h2 id="schritt-2-persistentvolumeclaim-anlegen">📁 Schritt 2:
+PersistentVolumeClaim anlegen</h2>
+<p><strong>pvc-nfs.yaml</strong></p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> PersistentVolumeClaim</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> nfs-pvc</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">accessModes</span><span class="kw">:</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> ReadWriteMany</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">resources</span><span class="kw">:</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">requests</span><span class="kw">:</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">storage</span><span class="kw">:</span><span class="at"> 1Gi</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">storageClassName</span><span class="kw">:</span><span class="at"> nfs-client</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> pvc-nfs.yaml</span></code></pre></div>
+<hr />
+<h2 id="schritt-3-pod-mit-gemountetem-volume">📁 Schritt 3: Pod mit
+gemountetem Volume</h2>
+<p><strong>nfs-test-pod.yaml</strong></p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Pod</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> nfs-test</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> test-container</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> busybox</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">&quot;/bin/sh&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;-c&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;while true; do date &gt;&gt; /mnt/nfs/dates.log; sleep 10; done&quot;</span><span class="kw">]</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">volumeMounts</span><span class="kw">:</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">mountPath</span><span class="kw">:</span><span class="at"> /mnt/nfs</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">name</span><span class="kw">:</span><span class="at"> nfs-vol</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">volumes</span><span class="kw">:</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> nfs-vol</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">persistentVolumeClaim</span><span class="kw">:</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">claimName</span><span class="kw">:</span><span class="at"> nfs-pvc</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> nfs-test-pod.yaml</span></code></pre></div>
+<hr />
+<h2 id="schritt-4-überprüfen">📁 Schritt 4: Überprüfen</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> exec <span class="at">-it</span> nfs-test <span class="at">--</span> cat /mnt/nfs/dates.log</span></code></pre></div>
+<blockquote>
+<p>Du solltest fortlaufend neue Timestamps sehen – das zeigt, dass der
+Pod <strong>schreibend</strong> auf das Volume zugreifen kann.</p>
+</blockquote>
+<hr />
+<h2 id="optional-standard-storageclass-setzen">📁 Optional:
+Standard-StorageClass setzen</h2>
+<p>Falls du möchtest, dass <code>nfs-client</code> die
+<em>Default</em>-StorageClass wird:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> patch storageclass nfs-client <span class="at">-p</span> <span class="st">&#39;{&quot;metadata&quot;: {&quot;annotations&quot;:{&quot;storageclass.kubernetes.io/is-default-class&quot;:&quot;true&quot;}}}&#39;</span></span></code></pre></div>
+<hr />
+<h2 id="aufräumen">🧹 Aufräumen</h2>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete pod nfs-test</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete pvc nfs-pvc</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="ex">helm</span> uninstall nfs-provisioner <span class="at">-n</span> nfs-storage</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete namespace nfs-storage</span></code></pre></div>

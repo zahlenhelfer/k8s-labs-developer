@@ -1,0 +1,71 @@
+<h1
+id="übung-verwendung-von-kubernetes.iochange-cause-in-deployments">🛠️
+Übung: Verwendung von <code>kubernetes.io/change-cause</code> in
+Deployments</h1>
+<hr />
+<h2 id="ziel">🎯 Ziel</h2>
+<ul>
+<li>Deployment mit <code>--record</code> bzw. <code>--annotation</code>
+ausführen</li>
+<li>Rollout History inklusive Change Cause anzeigen</li>
+<li>Rollback auf eine frühere Revision durchführen</li>
+</ul>
+<hr />
+<h2 id="schritt-1-einfaches-deployment-anlegen">📁 Schritt 1: Einfaches
+Deployment anlegen</h2>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> create deployment my-app <span class="at">--image</span><span class="op">=</span>nginx <span class="at">--replicas</span><span class="op">=</span>2 <span class="dt">\</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--dry-run</span><span class="op">=</span>client <span class="at">-o</span> yaml <span class="op">&gt;</span> my-app.yaml</span></code></pre></div>
+<p>Bearbeite die Datei <code>my-app.yaml</code> und füge <strong>diese
+Annotation</strong> im Deployment-Kopf hinzu (<strong>NICHT</strong> im
+Template):</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">annotations</span><span class="kw">:</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">kubernetes.io/change-cause</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;Initial deployment with nginx&quot;</span></span></code></pre></div>
+<p>Deployment erstellen:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> my-app.yaml</span></code></pre></div>
+<hr />
+<h2 id="schritt-2-erste-änderung-neues-image">📁 Schritt 2: Erste
+Änderung – neues Image</h2>
+<p>Bearbeite das Deployment (z. B. <code>nginx:1.25.0</code>):</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> set image deployment/my-app nginx=nginx:1.25.0 <span class="dt">\</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--record</span></span></code></pre></div>
+<blockquote>
+<p><code>--record</code> speichert automatisch den Befehl als
+<code>change-cause</code>.</p>
+</blockquote>
+<hr />
+<h2 id="schritt-3-weitere-änderung-mit-eigenem-change-cause">📁 Schritt
+3: Weitere Änderung mit eigenem Change Cause</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> annotate deployment my-app <span class="dt">\</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  kubernetes.io/change-cause=<span class="st">&quot;Update auf nginx 1.25.2 wegen Sicherheitsupdate&quot;</span> <span class="dt">\</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--overwrite</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> set image deployment/my-app nginx=nginx:1.25.2</span></code></pre></div>
+<hr />
+<h2 id="schritt-4-rollout-history-prüfen">📁 Schritt 4: Rollout-History
+prüfen</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> rollout history deployment my-app</span></code></pre></div>
+<blockquote>
+<p>Du solltest mehrere Revisionen mit <code>CHANGE-CAUSE</code>
+sehen.</p>
+</blockquote>
+<p>Details anzeigen:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> rollout history deployment my-app <span class="at">--revision</span><span class="op">=</span>2</span></code></pre></div>
+<hr />
+<h2 id="schritt-5-rollback-durchführen">📁 Schritt 5: Rollback
+durchführen</h2>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> rollout undo deployment my-app <span class="at">--to-revision</span><span class="op">=</span>1</span></code></pre></div>
+<p>Oder zum vorherigen Zustand:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> rollout undo deployment my-app</span></code></pre></div>
+<hr />
+<h2 id="todo-optional-change-cause-mittels-env-setzten">TODO: Optional
+Change-Cause mittels ENV setzten</h2>

@@ -1,0 +1,74 @@
+<h1 id="übung-kubernetes-pod-mit-hostpath-volume">🛠️ Übung: Kubernetes
+Pod mit <code>hostPath</code> Volume</h1>
+<hr />
+<h2 id="ziel">🎯 Ziel</h2>
+<ul>
+<li>Einen Pod erstellen, der ein Volume vom Typ <code>hostPath</code>
+einbindet</li>
+<li>Dateien auf dem Host-System vom Container aus lesen/schreiben</li>
+<li>Das Verhalten von <code>hostPath</code> verstehen</li>
+</ul>
+<hr />
+<h2 id="schritt-1-hostpath-pod-yaml-erstellen">📁 Schritt 1:
+<code>hostPath</code>-Pod YAML erstellen</h2>
+<p>Erstelle die Datei <code>hostpath-pod.yaml</code> mit folgendem
+Inhalt:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Pod</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> hostpath-demo</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> ubuntu</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> ubuntu</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">&quot;sleep&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;3600&quot;</span><span class="kw">]</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">volumeMounts</span><span class="kw">:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">mountPath</span><span class="kw">:</span><span class="at"> /data</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">name</span><span class="kw">:</span><span class="at"> my-volume</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">volumes</span><span class="kw">:</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> my-volume</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">hostPath</span><span class="kw">:</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">path</span><span class="kw">:</span><span class="at"> /tmp/hostdata</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">type</span><span class="kw">:</span><span class="at"> DirectoryOrCreate</span></span></code></pre></div>
+<p><strong>Erläuterung:</strong></p>
+<ul>
+<li><code>hostPath.path: /tmp/hostdata</code>: Dieser Pfad wird auf dem
+<strong>Node (nicht im Container!)</strong> verwendet.</li>
+<li><code>DirectoryOrCreate</code>: Wenn <code>/tmp/hostdata</code> auf
+dem Node nicht existiert, wird es automatisch erstellt.</li>
+<li>Im Container ist der Pfad unter <code>/data</code> verfügbar.</li>
+</ul>
+<hr />
+<h2 id="schritt-2-pod-anwenden">📁 Schritt 2: Pod anwenden</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> hostpath-pod.yaml</span></code></pre></div>
+<hr />
+<h2 id="schritt-3-in-den-container-einsteigen">📁 Schritt 3: In den
+Container einsteigen</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> exec <span class="at">-it</span> hostpath-demo <span class="at">--</span> bash</span></code></pre></div>
+<p>Dann im Container:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Hello from inside the container&quot;</span> <span class="op">&gt;</span> /data/test.txt</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span></span></code></pre></div>
+<hr />
+<h2 id="schritt-4-auf-dem-host-node-prüfen">📁 Schritt 4: Auf dem Host
+(Node) prüfen</h2>
+<blockquote>
+<p>Voraussetzung: Du kannst auf den Node zugreifen (z. B. bei minikube
+oder kind möglich)</p>
+</blockquote>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">minikube</span> ssh</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /tmp/hostdata/test.txt</span></code></pre></div>
+<p>Du solltest sehen:</p>
+<pre><code>Hello from inside the container</code></pre>
+<hr />
+<h2 id="schritt-5-clean-up">📁 Schritt 5: Clean-up</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete pod hostpath-demo</span></code></pre></div>
+<p>Optional: Auf dem Host den Ordner löschen</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">minikube</span> ssh</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> rm <span class="at">-rf</span> /tmp/hostdata</span></code></pre></div>

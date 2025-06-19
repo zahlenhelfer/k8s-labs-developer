@@ -1,0 +1,71 @@
+<h1 id="übung-docker-image-für-eine-einfache-python-app-erstellen">🛠️
+Übung: Docker-Image für eine einfache Python-App erstellen</h1>
+<hr />
+<h2 id="ziel">🎯 Ziel</h2>
+<ul>
+<li>Eine einfache Python-Web-App (mit Flask) schreiben</li>
+<li>Ein Dockerfile erstellen</li>
+<li>Docker-Image bauen und Container starten</li>
+</ul>
+<hr />
+<h2 id="schritt-1-python-app-erstellen">📁 Schritt 1: Python-App
+erstellen</h2>
+<p>Erstelle <code>app.py</code> mit folgendem Inhalt:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> flask <span class="im">import</span> Flask</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>app <span class="op">=</span> Flask(<span class="va">__name__</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">@app.route</span>(<span class="st">&#39;/&#39;</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hello():</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">&quot;Hallo von der Python-App!&quot;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&#39;__main__&#39;</span>:</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    app.run(host<span class="op">=</span><span class="st">&#39;0.0.0.0&#39;</span>, port<span class="op">=</span><span class="dv">5000</span>)</span></code></pre></div>
+<hr />
+<h2 id="schritt-2-requirements-datei-anlegen">📁 Schritt 2:
+Requirements-Datei anlegen</h2>
+<p>Erstelle <code>requirements.txt</code>:</p>
+<pre><code>Flask==3.0.0
+Werkzeug==3.0.1
+</code></pre>
+<hr />
+<h2 id="schritt-3-dockerfile-erstellen">📁 Schritt 3: Dockerfile
+erstellen</h2>
+<p>Erstelle eine Datei <code>Dockerfile</code>:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> python:3.11-slim</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WORKDIR</span> /app</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> requirements.txt .</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">pip</span> install <span class="at">--no-cache-dir</span> <span class="at">-r</span> requirements.txt</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> app.py .</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPOSE</span> 5000</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="kw">CMD</span> [<span class="st">&quot;python&quot;</span>, <span class="st">&quot;app.py&quot;</span>]</span></code></pre></div>
+<hr />
+<h2 id="schritt-4-docker-image-bauen">📁 Schritt 4: Docker-Image
+bauen</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> python-simple-app .</span></code></pre></div>
+<hr />
+<h2 id="schritt-5-docker-container-starten">📁 Schritt 5:
+Docker-Container starten</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-dit</span> <span class="at">--name</span> python-app <span class="at">-p</span> 5000:5000 python-simple-app</span></code></pre></div>
+<hr />
+<h2 id="schritt-6-testen">📁 Schritt 6: Testen</h2>
+<p>Im Browser oder per curl:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> http://localhost:5000</span></code></pre></div>
+<p>Erwartete Ausgabe:</p>
+<pre><code>Hallo von der Python-App!</code></pre>
+<hr />
+<h2 id="schritt-7-aufräumen">📁 Schritt 7: Aufräumen</h2>
+<p>Stoppe den Container mit <code>Ctrl+C</code> und lösche optional das
+Image:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> container rm <span class="at">-f</span> python-app</span></code></pre></div>

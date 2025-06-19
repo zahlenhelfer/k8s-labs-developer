@@ -1,0 +1,169 @@
+<h2
+id="übung-pod-security-standards-in-kubernetes-aktivieren-und-testen">🧪
+Übung: Pod Security Standards in Kubernetes aktivieren und testen</h2>
+<hr />
+<h3 id="ziel">🎯 Ziel</h3>
+<ul>
+<li>Ein Namespace mit Pod Security Standards Annotation anlegen</li>
+<li>Pods mit verschiedenen Sicherheitsleveln (Privileged, Baseline,
+Restricted) testen</li>
+<li>Verstehen, wie Kubernetes Pod Security Admission diese Pods zulässt
+oder ablehnt</li>
+</ul>
+<hr />
+<h2
+id="schritt-1-namespace-mit-pod-security-standards-annotation-anlegen">📁
+Schritt 1: Namespace mit Pod Security Standards Annotation anlegen</h2>
+<p>Erstelle <code>namespace-sec.yaml</code>:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Namespace</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> secure-ns</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">annotations</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">pod-security.kubernetes.io/enforce</span><span class="kw">:</span><span class="at"> restricted</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">pod-security.kubernetes.io/enforce-version</span><span class="kw">:</span><span class="at"> latest</span></span></code></pre></div>
+<p>Hier gilt der Modus <strong><code>restricted</code></strong>, das ist
+der strengste Standard.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> namespace-sec.yaml</span></code></pre></div>
+<hr />
+<h2
+id="schritt-2-pod-mit-unsicheren-einstellungen-erstellen-soll-abgelehnt-werden">📁
+Schritt 2: Pod mit unsicheren Einstellungen erstellen (soll abgelehnt
+werden)</h2>
+<p>Erstelle <code>pod-privileged.yaml</code>:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Pod</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> privileged-pod</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">namespace</span><span class="kw">:</span><span class="at"> secure-ns</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> busybox</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> busybox</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">securityContext</span><span class="kw">:</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">privileged</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">&quot;sh&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;-c&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;sleep 3600&quot;</span><span class="kw">]</span></span></code></pre></div>
+<p>Versuche den Pod zu erstellen:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> pod-privileged.yaml</span></code></pre></div>
+<p><strong>Erwartung:</strong> Der Pod wird <strong>abgelehnt</strong>,
+weil <code>privileged: true</code> nicht im <code>restricted</code>
+Standard erlaubt ist.</p>
+<hr />
+<h2
+id="schritt-3-pod-mit-baseline-konformen-einstellungen-erstellen-soll-akzeptiert-werden">📁
+Schritt 3: Pod mit Baseline-konformen Einstellungen erstellen (soll
+akzeptiert werden)</h2>
+<p>Erstelle <code>pod-baseline.yaml</code>:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Pod</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> baseline-pod</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">namespace</span><span class="kw">:</span><span class="at"> secure-ns</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">securityContext</span><span class="kw">:</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runAsNonRoot</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runAsUser</span><span class="kw">:</span><span class="at"> </span><span class="dv">1000</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> busybox</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> busybox</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">&quot;sh&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;-c&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;sleep 3600&quot;</span><span class="kw">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> pod-baseline.yaml</span></code></pre></div>
+<p>Der Pod sollte akzeptiert und gestartet werden.</p>
+<hr />
+<h2
+id="schritt-4-pod-ohne-securitycontext-erstellen-wird-im-restricted-namespace-oft-abgelehnt">📁
+Schritt 4: Pod ohne SecurityContext erstellen (wird im restricted
+Namespace oft abgelehnt)</h2>
+<p>Erstelle <code>pod-no-sec.yaml</code>:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Pod</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> no-sec-pod</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">namespace</span><span class="kw">:</span><span class="at"> secure-ns</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> busybox</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> busybox</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="st">&quot;sh&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;-c&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;sleep 3600&quot;</span><span class="kw">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> pod-no-sec.yaml</span></code></pre></div>
+<p>Dieser Pod wird <strong>wahrscheinlich abgelehnt</strong> (wegen
+fehlendem <code>runAsNonRoot</code>).</p>
+<hr />
+<h2 id="schritt-5-pod-security-standards-in-verschiedenen-modi">📁
+Schritt 5: Pod Security Standards in verschiedenen Modi</h2>
+<p>Du kannst die Annotation anpassen:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Modus</th>
+<th>Beschreibung</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>privileged</code></td>
+<td>Keine Einschränkungen (unsicher)</td>
+</tr>
+<tr class="even">
+<td><code>baseline</code></td>
+<td>Basis-Sicherheitsregeln (realistischer Kompromiss)</td>
+</tr>
+<tr class="odd">
+<td><code>restricted</code></td>
+<td>Strengste Sicherheitsregeln</td>
+</tr>
+</tbody>
+</table>
+<p>Beispiel für <code>baseline</code>:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">annotations</span><span class="kw">:</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">pod-security.kubernetes.io/enforce</span><span class="kw">:</span><span class="at"> baseline</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">pod-security.kubernetes.io/enforce-version</span><span class="kw">:</span><span class="at"> latest</span></span></code></pre></div>
+<hr />
+<h2 id="schritt-6-namespace-ändern-und-testen">📁 Schritt 6: Namespace
+ändern und testen</h2>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete ns secure-ns</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> namespace-sec.yaml  <span class="co"># mit anderen Annotationen</span></span></code></pre></div>
+<p>Dann die Pods erneut testen.</p>
+<hr />
+<h2 id="erklärung">🧠 Erklärung</h2>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 68%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Begriff</th>
+<th>Beschreibung</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Pod Security Standards (PSS)</td>
+<td>Eingebaute Kubernetes Admission Controller Regeln für
+Pod-Sicherheit</td>
+</tr>
+<tr class="even">
+<td>enforce</td>
+<td>Erzwingt den angegebenen Sicherheitsstandard in einem Namespace</td>
+</tr>
+<tr class="odd">
+<td>privileged, baseline, restricted</td>
+<td>Verschiedene Sicherheitsprofile mit unterschiedlicher Strenge</td>
+</tr>
+<tr class="even">
+<td>Admission Controller</td>
+<td>Blockiert Pods, die nicht den Regeln entsprechen</td>
+</tr>
+</tbody>
+</table>

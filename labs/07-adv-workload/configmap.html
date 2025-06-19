@@ -1,0 +1,113 @@
+<h2 id="übung-configmap-erstellen-und-im-pod-verwenden">🛠️
+<strong>Übung: ConfigMap erstellen und im Pod verwenden</strong></h2>
+<h3 id="ziel">🎯 Ziel</h3>
+<ul>
+<li>Eine ConfigMap mit Konfigurationswerten erstellen.</li>
+<li>Diese ConfigMap als Umgebungsvariable und als Datei in einen Pod
+einbinden.</li>
+<li>Den Inhalt im Container anzeigen.</li>
+</ul>
+<hr />
+<h3 id="schritt-1-erstelle-die-datei-my-configmap.yaml">📁 Schritt 1:
+Erstelle die Datei <code>my-configmap.yaml</code></h3>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> ConfigMap</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> demo-config</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">APP_MODE</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;development&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">WELCOME_MSG</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;Willkommen in Kubernetes!&quot;</span></span></code></pre></div>
+<hr />
+<h3 id="schritt-2-configmap-anwenden">🚀 Schritt 2: ConfigMap
+anwenden</h3>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> my-configmap.yaml</span></code></pre></div>
+<hr />
+<h3 id="schritt-3-erstelle-datei-pod-with-configmap.yaml">📁 Schritt 3:
+Erstelle Datei <code>pod-with-configmap.yaml</code></h3>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">apiVersion</span><span class="kw">:</span><span class="at"> v1</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kind</span><span class="kw">:</span><span class="at"> Pod</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> configmap-demo</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> demo-container</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">image</span><span class="kw">:</span><span class="at"> busybox</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">command</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="at"> </span><span class="st">&quot;sh&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;-c&quot;</span><span class="kw">,</span><span class="at"> </span><span class="st">&quot;env; echo; echo Datei-Inhalt:; cat /etc/config/WELCOME_MSG; sleep 3600&quot;</span><span class="at"> </span><span class="kw">]</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> APP_MODE</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">valueFrom</span><span class="kw">:</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">configMapKeyRef</span><span class="kw">:</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">name</span><span class="kw">:</span><span class="at"> demo-config</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">key</span><span class="kw">:</span><span class="at"> APP_MODE</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">volumeMounts</span><span class="kw">:</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> config-volume</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">mountPath</span><span class="kw">:</span><span class="at"> /etc/config</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">volumes</span><span class="kw">:</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> config-volume</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">configMap</span><span class="kw">:</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">name</span><span class="kw">:</span><span class="at"> demo-config</span></span></code></pre></div>
+<hr />
+<h3 id="schritt-4-pod-starten">🚀 Schritt 4: Pod starten</h3>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> pod-with-configmap.yaml</span></code></pre></div>
+<hr />
+<h3 id="schritt-5-pod-prüfen">🔍 Schritt 5: Pod prüfen</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> get pod configmap-demo</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> logs configmap-demo</span></code></pre></div>
+<p>→ Du solltest Folgendes sehen:</p>
+<ul>
+<li><code>APP_MODE=development</code> aus Umgebungsvariable</li>
+<li>Datei-Inhalt aus <code>/etc/config/WELCOME_MSG</code>:
+<code>Willkommen in Kubernetes!</code></li>
+</ul>
+<hr />
+<h3 id="schritt-6-werte-live-ändern">🧪 Schritt 6: Werte live
+ändern</h3>
+<p>Ändere z. B. den Begrüßungstext:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> create configmap demo-config <span class="at">--from-literal</span><span class="op">=</span>WELCOME_MSG=<span class="st">&quot;Hallo aus dem Cluster!&quot;</span> <span class="at">--from-literal</span><span class="op">=</span>APP_MODE=<span class="st">&quot;production&quot;</span> <span class="at">-o</span> yaml <span class="at">--dry-run</span><span class="op">=</span>client <span class="kw">|</span> <span class="ex">kubectl</span> apply <span class="at">-f</span> <span class="at">-</span></span></code></pre></div>
+<p>Danach:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete pod configmap-demo</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> apply <span class="at">-f</span> pod-with-configmap.yaml</span></code></pre></div>
+<p>→ Änderungen sind <strong>nur nach Neustart</strong> des Pods
+wirksam!</p>
+<hr />
+<h3 id="schritt-7-aufräumen">🧹 Schritt 7: Aufräumen</h3>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete pod configmap-demo</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">kubectl</span> delete configmap demo-config</span></code></pre></div>
+<hr />
+<h3 id="wichtiges-wissen">🧠 Wichtiges Wissen</h3>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 79%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Verwendung</th>
+<th>Beschreibung</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>envFrom / env</strong></td>
+<td>Zugriff auf Werte als Umgebungsvariablen</td>
+</tr>
+<tr class="even">
+<td><strong>volumeMount</strong></td>
+<td>Zugriff auf Werte als Dateien im Container</td>
+</tr>
+<tr class="odd">
+<td><strong>Live-Updates</strong></td>
+<td>Werden nicht automatisch erkannt – Pod muss neu gestartet
+werden</td>
+</tr>
+</tbody>
+</table>
+<hr />
