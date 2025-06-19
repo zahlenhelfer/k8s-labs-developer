@@ -37,18 +37,3 @@ jobs:
       with:
         tag_name: ${{ steps.create_tag.outputs.TAG_NAME }}
         files: pdfs/**/*.pdf
-
-    - name: Convert to HTML
-      uses: gbraad-actions/pandoc@main
-      with:
-        source: "labs/*.md"
-        output-format: html
-        output-dir: ./html
-        extra-args: "--standalone --css=style.css"
-
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./html
-        publish_branch: gh-pages
