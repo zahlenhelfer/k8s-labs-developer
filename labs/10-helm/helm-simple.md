@@ -82,4 +82,3 @@ helm upgrade my-nginx my-nginx-chart --namespace demo --set replicaCount=3
 ```bash
 helm uninstall my-nginx --namespace demo
 ```
-
