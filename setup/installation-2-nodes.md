@@ -1,4 +1,4 @@
-# Installation eines zwei Node Kubernetes-Cluster
+# 🧪: Installation eines zwei Node Kubernetes-Cluster
 
 ## Login:
 - `ssh student@k8s-node-XX.dockerlabs.de`
