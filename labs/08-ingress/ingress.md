@@ -1,4 +1,3 @@
-
 # 🧪 Übung: Ingress mit einem einfachen Webserver
 
 ---
@@ -7,7 +6,7 @@
 
 * Ein Deployment mit einem Webserver (NGINX)
 * Einen Service vom Typ ClusterIP
-* Einen Ingress, der HTTP-Zugriffe auf eine Domain (`example.local`) zu diesem Service weiterleitet
+* HTTP-Zugriffe von einer Domain (`example.local`) weiterleiten
 
 ---
 
@@ -17,7 +16,7 @@
 * Ein installierter **Ingress-Controller** (z. B. NGINX)
 * Domain `example.local` per `/etc/hosts` auf deinen Cluster zeigen
 
-> 👉 Wenn du z. B. Minikube nutzt, installiere den Ingress-Controller:
+>Wenn du z. B. Minikube nutzt, installiere den Ingress-Controller per:
 
 ```bash
 minikube addons enable ingress
@@ -27,7 +26,7 @@ minikube addons enable ingress
 
 ## 🧱 1. Webserver Deployment & Service
 
-**nginx-deploy.yaml**
+### `nginx-deploy.yaml`
 
 ```yaml
 apiVersion: apps/v1
@@ -63,6 +62,8 @@ spec:
     protocol: TCP
 ```
 
+### Ressource deployen
+
 ```bash
 kubectl apply -f nginx-deploy.yaml
 ```
@@ -71,7 +72,7 @@ kubectl apply -f nginx-deploy.yaml
 
 ## 🌐 2. Ingress konfigurieren
 
-**nginx-ingress.yaml**
+### `nginx-ingress.yaml`
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -105,6 +106,7 @@ kubectl apply -f nginx-ingress.yaml
 `curl -H "Host: example.local" http://<IP>`
 
 ---
+
 ## 🛠️ 3a. Lokales DNS setzen
 
 Füge zu deiner `/etc/hosts` folgendes hinzu (Root-Rechte nötig):
