@@ -13,41 +13,16 @@ on:
 jobs:
   convert-and-release:
     runs-on: ubuntu-latest
+    container:
+      image: pandoc/latex:latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0  # Fetch all history for all branches and tags
-
-    - name: Cache apt packages
-      uses: actions/cache@v3
-      with:
-        path: /var/cache/apt
-        key: ${{ runner.os }}-apt-${{ hashFiles('**/apt-cache-key') }}
-        restore-keys: |
-          ${{ runner.os }}-apt-
-
-    - name: Install Pandoc and LaTeX
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic fonts-noto fonts-noto-core fonts-noto-extra fonts-noto-color-emoji
 
     - name: Convert Markdown to PDF
       run: |
-        mkdir -p pdfs
-        for md_file in $(find . -name "*.md"); do
-          echo "Converting $md_file to PDF..."
-          relative_path=$(echo "$md_file" | sed 's|^\./||')
-          pdf_dir="pdfs/$(dirname "$relative_path")"
-          mkdir -p "$pdf_dir"
-          if pandoc "$md_file" -o "${pdf_dir}/$(basename "${md_file%.md}".pdf)" --pdf-engine=xelatex -V emojifont="Noto Color Emoji" -V mainfont="Noto Serif" -V monofont="Noto Mono" -V geometry:margin=1in; then
-            echo "Successfully converted $md_file to PDF"
-          else
-            echo "Failed to convert $md_file to PDF"
-            exit 1
-          fi
-        done
+        pandoc README.md -o README.pdf --toc
 
     - name: Create Release Tag
       id: create_tag
@@ -63,31 +38,13 @@ jobs:
         tag_name: ${{ steps.create_tag.outputs.TAG_NAME }}
         files: pdfs/**/*.pdf
 
-    - name: Upload PDFs to Release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Convert to HTML
+      uses: gbraad-actions/pandoc@main
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./pdfs/
-        asset_name: markdown-pdfs.zip
-        asset_content_type: application/zip
-
-    - name: Convert Markdown to HTML
-      run: |
-        mkdir -p html
-        for md_file in $(find . -name "*.md"); do
-          echo "Converting $md_file to HTML..."
-          relative_path=$(echo "$md_file" | sed 's|^\./||')
-          html_dir="html/$(dirname "$relative_path")"
-          mkdir -p "$html_dir"
-          if pandoc "$md_file" -o "${html_dir}/$(basename "${md_file%.md}".html)" --standalone; then
-            echo "Successfully converted $md_file to HTML"
-          else
-            echo "Failed to convert $md_file to HTML"
-            exit 1
-          fi
-        done
+        source: "labs/*.md"
+        output-format: html
+        output-dir: ./html
+        extra-args: "--standalone --css=style.css"
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
