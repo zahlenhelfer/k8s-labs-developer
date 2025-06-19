@@ -23,7 +23,7 @@ jobs:
     - name: Install Pandoc and LaTeX
       run: |
         sudo apt-get update
-        sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic fonts-noto
+        sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic fonts-noto fonts-noto-core fonts-noto-extra
 
     - name: Convert Markdown to PDF
       run: |
@@ -33,7 +33,7 @@ jobs:
           relative_path=$(echo "$md_file" | sed 's|^\./||')
           pdf_dir="pdfs/$(dirname "$relative_path")"
           mkdir -p "$pdf_dir"
-          if pandoc "$md_file" -o "${pdf_dir}/$(basename "${md_file%.md}".pdf)" --pdf-engine=xelatex -M emoji=noto-emoji -V mainfont="Noto Serif" -V monofont="Noto Mono" -V geometry:margin=1in; then
+          if pandoc "$md_file" -o "${pdf_dir}/$(basename "${md_file%.md}".pdf)" --pdf-engine=xelatex -V emojifont="Noto Color Emoji" -V mainfont="Noto Serif" -V monofont="Noto Mono" -V geometry:margin=1in; then
             echo "Successfully converted $md_file to PDF"
           else
             echo "Failed to convert $md_file to PDF"
