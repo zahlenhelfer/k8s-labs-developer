@@ -70,3 +70,26 @@ jobs:
         asset_path: ./pdfs/
         asset_name: markdown-pdfs.zip
         asset_content_type: application/zip
+
+    - name: Convert Markdown to HTML
+      run: |
+        mkdir -p html
+        for md_file in $(find . -name "*.md"); do
+          echo "Converting $md_file to HTML..."
+          relative_path=$(echo "$md_file" | sed 's|^\./||')
+          html_dir="html/$(dirname "$relative_path")"
+          mkdir -p "$html_dir"
+          if pandoc "$md_file" -o "${html_dir}/$(basename "${md_file%.md}".html)" --standalone; then
+            echo "Successfully converted $md_file to HTML"
+          else
+            echo "Failed to convert $md_file to HTML"
+            exit 1
+          fi
+        done
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./html
+        publish_branch: gh-pages
