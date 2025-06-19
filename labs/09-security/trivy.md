@@ -1,5 +1,5 @@
 
-# 🛠️ Übung: Trivy installieren und nginx Docker-Image scannen
+# 🧪 Übung: Trivy installieren und nginx Docker-Image scannen
 
 ---
 
