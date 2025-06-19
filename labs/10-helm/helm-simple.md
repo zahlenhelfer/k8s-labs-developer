@@ -1,5 +1,5 @@
 
-# 🛠️ Übung: Einfaches Helm-Chart erstellen und deployen
+# 🧪 Übung: Einfaches Helm-Chart erstellen und deployen
 
 ---
 
