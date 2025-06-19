@@ -1,5 +1,5 @@
 
-# 🛠️ Übung: Helm-Chart, das ein Kubernetes Secret erstellt
+# 🧪 Übung: Helm-Chart, das ein Kubernetes Secret erstellt
 
 ---
 
