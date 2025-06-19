@@ -13,13 +13,14 @@
 ---
 
 ## 📁 Schritt 1: Projektstruktur
-- __ACHTUNG:__ docker alias für podman nutzen -> `alias docker=podman`
 
-- Projekt anlegen `mkdir java-spring-multistage && cd java-spring-multistage`
+* __ACHTUNG:__ docker alias für podman nutzen -> `alias docker=podman`
 
-- Pfad anlegen `mkdir -p src/main/java/com/example/demo/`
+* Projekt anlegen `mkdir java-spring-multistage && cd java-spring-multistage`
 
-```
+* Pfad anlegen `mkdir -p src/main/java/com/example/demo/`
+
+```text
 java-spring-multistage/
 ├── Dockerfile
 ├── pom.xml
@@ -172,4 +173,3 @@ Container mit `Ctrl+C` stoppen und optional Image löschen:
 ```bash
 docker rm -f java-app
 ```
-
