@@ -1,11 +1,15 @@
-# k8s-labs-developer
+
+# [k8s-labs-developer](https://zahlenhelfer.github.io/k8s-labs-developer/)
+
 Kubernetes Developer Training Files
 
 ## Setup
+
 - [Setup eines 2 Knoten-Cluster](/setup/installation-2-nodes.md)
 - [Setup NGINX Ingress-Controller](/setup/installation-ingress.md)
 
 ## Labs
+
 - [Container Images](/labs/00-images/README.md)
 - [Pods](/labs/01-pods/README.md)
 - [ReplicaSets](/labs/02-replicaset/README.md)
