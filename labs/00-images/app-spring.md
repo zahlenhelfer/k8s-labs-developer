@@ -160,7 +160,7 @@ curl http://localhost:8080
 
 Erwarte:
 
-```
+```console
 Hallo von der Java Spring Boot App!
 ```
 
