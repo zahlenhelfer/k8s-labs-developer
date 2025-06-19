@@ -23,7 +23,7 @@ jobs:
     - name: Install Pandoc and LaTeX
       run: |
         sudo apt-get update
-        sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic
+        sudo apt-get install -y pandoc texlive-xetex texlive-fonts-recommended texlive-plain-generic fonts-noto
 
     - name: Convert Markdown to PDF
       run: |
@@ -33,14 +33,13 @@ jobs:
           relative_path=$(echo "$md_file" | sed 's|^\./||')
           pdf_dir="pdfs/$(dirname "$relative_path")"
           mkdir -p "$pdf_dir"
-          if pandoc "$md_file" -o "${pdf_dir}/$(basename "${md_file%.md}".pdf)" --pdf-engine=xelatex; then
-            echo "Successfully converted $md_file"
+          if pandoc "$md_file" -o "${pdf_dir}/$(basename "${md_file%.md}".pdf)" --pdf-engine=xelatex -V mainfont="Noto Serif"; then
+            echo "Successfully converted $md_file to PDF"
           else
-            echo "Failed to convert $md_file"
+            echo "Failed to convert $md_file to PDF"
             exit 1
           fi
         done
-      continue-on-error: false
 
     - name: Create Release Tag
       id: create_tag
