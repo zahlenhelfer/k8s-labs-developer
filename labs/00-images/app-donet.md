@@ -1,13 +1,9 @@
-
 # 🛠️ Übung: Multi-Stage Docker-Image für eine dotNET Core Web API erstellen
 ---
-
 ## 🎯 Ziel
-
 * Eine einfache .NET Core Web API schreiben
 * Multi-Stage Dockerfile nutzen (Build + Runtime)
 * Image bauen und Container starten
-
 ---
 ## 📁 Schritt 0: .NET Core-Installation
 
