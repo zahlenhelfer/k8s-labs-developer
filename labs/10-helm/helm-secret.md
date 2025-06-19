@@ -1,6 +1,3 @@
-Klar! Hier eine einfache Übung, wie du mit Helm ein Secret via Template erstellst und im Chart nutzt.
-
----
 
 # 🛠️ Übung: Helm-Chart, das ein Kubernetes Secret erstellt
 
