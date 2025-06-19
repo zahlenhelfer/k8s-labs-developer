@@ -1,4 +1,4 @@
-# 
+# 🧪 Übung: NGINX-Ingress-Controller installieren
 
 ## 🧩 Schritt 1: Anlegen einer values.yaml Datei
 
