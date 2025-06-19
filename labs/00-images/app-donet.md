@@ -1,6 +1,5 @@
 
-# 🛠️ Übung: Multi-Stage Docker-Image für eine .NET Core Web API erstellen
-
+# 🛠️ Übung: Multi-Stage Docker-Image für eine dotNET Core Web API erstellen
 ---
 
 ## 🎯 Ziel
