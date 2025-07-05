@@ -1,0 +1,54 @@
+site_name: k8s-labs
+theme: readthedocs
+nav:
+  - Home: README.md
+  - Setup:
+      - Setup von zwei Kubernetes Nodes: setup/installation-2-nodes.md
+      - Setup NGINX-Ingress: setup/installation-ingress.md
+  - Labs:
+      - Images:
+          - DotNet-Image erstellen: labs/00-images/app-dotnet.md
+          - Go-Image erstellen: labs/00-images/app-go.md
+          - Node-Image erstellen: labs/00-images/app-node.md
+          - Python-Image erstellen: labs/00-images/app-python.md
+          - Java-Image erstellen: labs/00-images/app-spring.md
+      - Pods:
+          - Einfachen Pod erstellen: labs/01-pods/pod-simplepod.md
+          - Livenesscheck verstehen: labs/01-pods/pod-livenesscheck.md
+          - Request & Limits verstehen: labs/01-pods/pod-request-limits.md
+          - OOM-Killer verstehen: labs/01-pods/pod-oom-kill.md
+      - ReplicaSet:
+          - ReplicaSet benutzen: labs/02-replicas/replicaset.md
+          - ReplicaSet & Labels: labs/02-replicas/lostpod.md
+      - Deployment:
+          - Rollout & Rollback: labs/03-deployment/deployment.md
+          - Annotation: labs/03-deployment/annotations.md
+      - Services:
+          - vier Service-Typen: labs/04-services/services.md
+      - Storage:
+          - Volume: labs/05-storage/volume.md
+          - PersistenVolume & Claim: labs/05-storage/host-path.md
+          - dyn. Provisioning: labs/05-storage/nfs-dynpro.md
+      - Secrets:
+          - Secrets nutzen: labs/06-secrets/secrets.md
+          - TLS-Zertifikate als Secret: labs/06-secrets/tls-nginx.md
+      - adv. Workloads:
+          - ConfigMaps nutzen: labs/07-adv-workloads/configmap.md
+          - Cronjob nutzen: labs/07-adv-workloads/cronjob-simple.md
+          - Cronjob für Backups nutzen: labs/07-adv-workloads/cronjob-backup.md
+          - StatefullSet nutzen: labs/07-adv-workloads/statefullset-simple.md
+          - StatefullSet für MySQL nutzen: labs/07-adv-workloads/statefullset-mysql.md
+          - EFK-Stack (DaemonSet) fürs Logging nutzen: labs/07-adv-workloads/efk-logging.md
+      - Ingress:
+          - Ingress Controller installieren: labs/08-ingress/installation-ingress.md
+          - Ingress nutzen: labs/08-ingress/ingress.md
+          - Ingress mit TLS nutzen: labs/08-ingress/tls-ingress.md
+      - Security:
+          - Networkpolicies nutzen: labs/09-security/network-policies.md
+          - Pod Security Context: labs/09-security/security-context.md
+          - Pod Security Policies: labs/09-security/psp.md
+          - Images mit Trivy scannen: labs/09-security/trivy.md
+      - Helm:
+          - Helm Charts nutzen: labs/10-helm/helm-nginx.md
+          - Helm Charts erstellen: labs/10-helm/helm-simple.md
+          - Helm Charts erweitern: labs/10-helm/helm-secret.md
